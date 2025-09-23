@@ -98,13 +98,17 @@
                             <button id="add-city-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Add City</button>
                         </div>
 
-                        <h3 class="text-xl font-semibold mt-6 mb-2"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages/64bafe92999de952790fe6fb" target="_blank" class="text-blue-600 hover:underline">B. Content Strategy: Blog / Resource Center</a></h3>
+                        <h3 class="text-xl font-semibold mt-6 mb-2">B. Content Strategy: Blog / Resource Center</h3>
                         <div class="space-y-2" id="blog-post-list">
                              <!-- Blog posts will be loaded here by JavaScript -->
                         </div>
                          <div class="mt-4 flex space-x-2">
                             <input type="text" id="new-blog-post" placeholder="Enter new blog post title..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                             <button id="add-blog-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Add Post</button>
+                        </div>
+                        <h3 class="text-xl font-semibold mt-6 mb-2">C. Video Content</h3>
+                        <div class="space-y-2">
+                            <div class="task-item flex items-center"><input id="task-video-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-video-1" class="ml-3 text-gray-700">Film short video (e.g., "How to Change Your Furnace Filter")</label></div>
                         </div>
                     </div>
                 </div>
@@ -132,7 +136,7 @@
                                 <tbody>
                                     <tr class="hover:bg-gray-50">
                                         <td class="p-3 border-b">Furnace Maintenance</td>
-                                        <td class="p-3 border-b">Fall</td>
+                                        <td class="p-3 border-b">Fall / Winter</td>
                                         <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
                                     </tr>
                                     <tr class="hover:bg-gray-50">
@@ -162,6 +166,12 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <h3 class="text-xl font-semibold mt-6 mb-2">D. New Campaign Ideas</h3>
+                        <div class="space-y-2">
+                             <div class="task-item flex items-center"><input id="task-ads-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-ads-1" class="ml-3 text-gray-700">Launch a Retargeting Campaign</label></div>
+                             <div class="task-item flex items-center"><input id="task-ads-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-ads-2" class="ml-3 text-gray-700">Test Call-Only Ads for Emergencies</label></div>
+                             <div class="task-item flex items-center"><input id="task-ads-3" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-ads-3" class="ml-3 text-gray-700">Test Performance Max Campaign</label></div>
                         </div>
                     </div>
                 </div>
@@ -193,6 +203,11 @@
                                 <div class="task-item flex items-center"><input id="task-gbp-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-gbp-2" class="ml-3 text-gray-700">Add New Job Photos</label></div>
                                 <div class="task-item flex items-center"><input id="task-gbp-3" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-gbp-3" class="ml-3 text-gray-700">Respond to All New Reviews</label></div>
                             </div>
+                             <h3 class="text-xl font-semibold mt-6 mb-2">B. Foundational Tasks</h3>
+                            <div class="space-y-2">
+                                <div class="task-item flex items-center"><input id="task-offpage-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-offpage-1" class="ml-3 text-gray-700">Build Local Citations (Yelp, Angi, BBB)</label></div>
+                                <div class="task-item flex items-center"><input id="task-offpage-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-offpage-2" class="ml-3 text-gray-700">Proactively ask satisfied customers for reviews</label></div>
+                            </div>
                        </div>
                 </div>
                 <div class="dashboard-card">
@@ -202,6 +217,7 @@
                             <div class="space-y-2">
                                 <div class="task-item flex items-center"><input id="task-tech-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label class="ml-3 text-gray-700"><a href="https://pagespeed.web.dev/" target="_blank" class="hover:underline text-blue-600">Run PageSpeed Insights report</a></label></div>
                                 <div class="task-item flex items-center"><input id="task-tech-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-tech-2" class="ml-3 text-gray-700">Check for crawl errors (in GSC)</label></div>
+                                <div class="task-item flex items-center"><input id="task-tech-3" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-tech-3" class="ml-3 text-gray-700">Add Schema Markup to website</label></div>
                             </div>
                             <h3 class="text-xl font-semibold mt-6 mb-2">B. How-To Guides & Summaries</h3>
                             <div class="text-sm text-gray-600">
@@ -211,14 +227,16 @@
                 </div>
                 <div class="dashboard-card">
                        <div class="p-6">
-                            <h2 class="text-2xl font-bold mb-4">Pillar 4: Social & Email</h2>
-                            <h3 class="text-xl font-semibold mb-2">A. Social Media (Weekly)</h3>
+                            <h2 class="text-2xl font-bold mb-4">Pillar 4: Growth & Retention</h2>
+                            <h3 class="text-xl font-semibold mb-2">A. Customer Retention</h3>
                             <div class="space-y-2">
-                                <div class="task-item flex items-center"><input id="task-social-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label class="ml-3 text-gray-700"><a href="https://www.facebook.com/mechanicaltemp" target="_blank" class="hover:underline text-blue-600">Post on Facebook (2x)</a></label></div>
+                                <div class="task-item flex items-center"><input id="task-growth-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-growth-1" class="ml-3 text-gray-700">Implement Service Reminder emails/texts</label></div>
+                                <div class="task-item flex items-center"><input id="task-growth-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-growth-2" class="ml-3 text-gray-700">Start a simple customer referral program</label></div>
                             </div>
-                            <h3 class="text-xl font-semibold mt-6 mb-2">B. Email Marketing (Monthly)</h3>
+                            <h3 class="text-xl font-semibold mt-6 mb-2">B. Community & Offline Presence</h3>
                             <div class="space-y-2">
-                                <div class="task-item flex items-center"><input id="task-email-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-email-1" class="ml-3 text-gray-700">Send newsletter with tips & offers</label></div>
+                                <div class="task-item flex items-center"><input id="task-growth-3" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-growth-3" class="ml-3 text-gray-700">Partner with local businesses (realtors, etc.)</label></div>
+                                 <div class="task-item flex items-center"><input id="task-growth-4" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-growth-4" class="ml-3 text-gray-700">Use lawn signs after jobs (with permission)</label></div>
                             </div>
                        </div>
                 </div>
