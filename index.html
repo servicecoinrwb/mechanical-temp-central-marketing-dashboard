@@ -23,14 +23,16 @@
             background-color: #1A2D4E;
             color: white;
         }
-        .status-live {
-            background-color: #dcfce7;
-            color: #166534;
-            padding: 2px 8px;
+        .status-live, .status-active, .status-paused {
+            padding: 2px 10px;
             border-radius: 9999px;
             font-size: 0.8rem;
             font-weight: 600;
+            text-align: center;
         }
+        .status-live { background-color: #dcfce7; color: #166534; }
+        .status-active { background-color: #dcfce7; color: #166534; }
+        .status-paused { background-color: #fee2e2; color: #991b1b; }
         .task-item:has(input:checked) label, .task-item:has(input:checked) a {
             text-decoration: line-through;
             color: #6b7280;
@@ -52,87 +54,97 @@
             <div class="flex space-x-4 mt-4 md:mt-0">
                 <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amechanicaltemp.com" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Google Search Console</a>
                 <a href="https://www.google.com/search?q=mechanical+temp&rlz=1C1SQJL_enUS786US786&oq=mechanical+temp&gs_lcrp=EgZjaHJvbWUqDAgAECMYJxiABBiKBTIMCAAQIxgnGIAEGIoFMhAIARAuGK8BGMcBGIAEGI4FMgcIAhAAGIAEMgcIAxAAGIAEMgYIBBBFGEEyBggFEEUYPTIGCAYQRRhBMgYIBxBFGEHSAQgzODg1ajBqN6gCCLACAfEFHzkU-rb4cPnxBR85FPq2-HD5&sourceid=chrome&ie=UTF-8" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Google Business Profile</a>
+                 <a href="https://ads.google.com/aw/campaigns" target="_blank" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition">Google Ads</a>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-            <!-- LEFT COLUMN: ON-PAGE & OFF-PAGE SEO -->
+            <!-- LEFT COLUMN: SEO & CONTENT -->
             <div class="lg:col-span-2 space-y-8">
                 <!-- ON-PAGE SEO -->
                 <div class="dashboard-card">
                     <div class="p-6">
-                        <h2 class="text-2xl font-bold mb-4">Pillar 1: On-Page SEO</h2>
-                        <!-- Local Service Pages -->
+                        <h2 class="text-2xl font-bold mb-4">Pillar 1: On-Page SEO (Organic)</h2>
                         <h3 class="text-xl font-semibold mb-2">A. Local Service Area Pages</h3>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr>
-                                        <th class="p-3 border-b">City</th>
-                                        <th class="p-3 border-b">URL</th>
-                                        <th class="p-3 border-b">Status</th>
-                                    </tr>
+                                    <tr><th class="p-3 border-b">City</th><th class="p-3 border-b">URL</th><th class="p-3 border-b">Status</th></tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Dearborn</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/dearborn" target="_blank" class="text-blue-600 hover:underline">/service-areas/dearborn</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
-                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Southfield</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/southfield" target="_blank" class="text-blue-600 hover:underline">/service-areas/southfield</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
-                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Novi</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/novi" target="_blank" class="text-blue-600 hover:underline">/service-areas/novi</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
-                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Redford</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/redford" target="_blank" class="text-blue-600 hover:underline">/service-areas/redford</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
-                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Farmington Hills</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/farmington-hills" target="_blank" class="text-blue-600 hover:underline">/service-areas/farmington-hills</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
-                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Royal Oak</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/royal-oak" target="_blank" class="text-blue-600 hover:underline">/service-areas/royal-oak</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Dearborn</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/dearborn" target="_blank" class="text-blue-600 hover:underline">/dearborn</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Southfield</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/southfield" target="_blank" class="text-blue-600 hover:underline">/southfield</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Novi</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/novi" target="_blank" class="text-blue-600 hover:underline">/novi</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Redford</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/redford" target="_blank" class="text-blue-600 hover:underline">/redford</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Farmington Hills</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/farmington-hills" target="_blank" class="text-blue-600 hover:underline">/farmington-hills</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Royal Oak</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/royal-oak" target="_blank" class="text-blue-600 hover:underline">/royal-oak</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
                                 </tbody>
                             </table>
                         </div>
-                        
-                        <!-- Blog Content Strategy -->
                         <h3 class="text-xl font-semibold mt-6 mb-2">B. Content Strategy: Blog / Resource Center</h3>
                         <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task1" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task1" class="ml-3 text-gray-700">How to Prepare Your Furnace for a Michigan Winter</label></div>
-                            <div class="task-item flex items-center"><input id="task2" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task2" class="ml-3 text-gray-700">Is My AC Ready for Michigan's Humid Summers?</label></div>
-                            <div class="task-item flex items-center"><input id="task3" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task3" class="ml-3 text-gray-700">Why is My DTE/Consumers Energy Bill So High?</label></div>
-                            <div class="task-item flex items-center"><input id="task4" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task4" class="ml-3 text-gray-700">The Best Smart Thermostats for Metro Detroit Homes</label></div>
-                        </div>
-
-                        <!-- Service Page Expansion -->
-                        <h3 class="text-xl font-semibold mt-6 mb-2">C. Service Page Expansion</h3>
-                         <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task5" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task5" class="ml-3 text-gray-700">Create page for "Furnace Repair"</label></div>
-                            <div class="task-item flex items-center"><input id="task6" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task6" class="ml-3 text-gray-700">Create page for "Air Conditioner Installation"</label></div>
-                            <div class="task-item flex items-center"><input id="task7" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task7" class="ml-3 text-gray-700">Create page for "HVAC Maintenance"</label></div>
+                            <div class="task-item flex items-center"><input id="task1" type="checkbox" class="h-4 w-4 rounded"><label for="task1" class="ml-3 text-gray-700">How to Prepare Your Furnace for a Michigan Winter</label></div>
+                            <div class="task-item flex items-center"><input id="task2" type="checkbox" class="h-4 w-4 rounded"><label for="task2" class="ml-3 text-gray-700">Is My AC Ready for Michigan's Humid Summers?</label></div>
                         </div>
                     </div>
                 </div>
-                <!-- OFF-PAGE SEO -->
+                <!-- GOOGLE ADS -->
                 <div class="dashboard-card">
-                     <div class="p-6">
-                        <h2 class="text-2xl font-bold mb-4">Pillar 2: Off-Page SEO</h2>
-                        <h3 class="text-xl font-semibold mb-2">A. Google Business Profile Management</h3>
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold mb-4">Pillar 5: Google Ads (Paid Search)</h2>
+                         <h3 class="text-xl font-semibold mb-2">A. Campaign Foundation</h3>
                         <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task8" type="checkbox" class="h-4 w-4 rounded"><label for="task8" class="ml-3 text-gray-700">Publish Weekly Post</label></div>
-                            <div class="task-item flex items-center"><input id="task9" type="checkbox" class="h-4 w-4 rounded"><label for="task9" class="ml-3 text-gray-700">Add New Photos</label></div>
-                            <div class="task-item flex items-center"><input id="task10" type="checkbox" class="h-4 w-4 rounded"><label for="task10" class="ml-3 text-gray-700">Respond to New Reviews</label></div>
+                             <div class="task-item flex items-center"><input type="checkbox" checked disabled><label class="ml-3 text-gray-700">High-Converting Landing Page Live (<a href="https://www.mechanicaltemp.site" target="_blank" class="text-blue-600 hover:underline">mechanicaltemp.site</a>)</label></div>
+                             <div class="task-item flex items-center"><input type="checkbox" checked disabled><label class="ml-3 text-gray-700">Conversion Tracking Installed (Calls & Forms)</label></div>
+                             <div class="task-item flex items-center"><input type="checkbox" checked disabled><label class="ml-3 text-gray-700">LSA Campaign Paused to focus budget</label></div>
                         </div>
-
-                        <h3 class="text-xl font-semibold mt-6 mb-2">B. Local Citations</h3>
+                         <h3 class="text-xl font-semibold mt-6 mb-2">B. Active Campaign Management (Weekly Tasks)</h3>
                         <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task11" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://biz.yelp.com/" target="_blank" class="hover:underline text-blue-600">Check Yelp Profile</a></label></div>
-                            <div class="task-item flex items-center"><input id="task12" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://office.angi.com/" target="_blank" class="hover:underline text-blue-600">Check HomeAdvisor/Angi Profile</a></label></div>
-                            <div class="task-item flex items-center"><input id="task13" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://www.bbb.org/" target="_blank" class="hover:underline text-blue-600">Check BBB Profile</a></label></div>
+                             <div class="task-item flex items-center"><input id="task20" type="checkbox" class="h-4 w-4 rounded"><label for="task20" class="ml-3 text-gray-700">Review "Search Terms" Report for wasted spend</label></div>
+                             <div class="task-item flex items-center"><input id="task21" type="checkbox" class="h-4 w-4 rounded"><label for="task21" class="ml-3 text-gray-700">Add new Negative Keywords from report</label></div>
+                             <div class="task-item flex items-center"><input id="task22" type="checkbox" class="h-4 w-4 rounded"><label for="task22" class="ml-3 text-gray-700">Check Ad Performance (Click-Through Rate)</label></div>
+                        </div>
+                         <h3 class="text-xl font-semibold mt-6 mb-2">C. Seasonal Ad Group Status (Late September)</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr><th class="p-3 border-b">Ad Group</th><th class="p-3 border-b">Recommended Season</th><th class="p-3 border-b">Status</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Furnace Maintenance</td><td class="p-3 border-b">Fall / Winter</td><td class="p-3 border-b"><span class="status-active">✅ Active</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Emergency Furnace Repair</td><td class="p-3 border-b">Fall / Winter</td><td class="p-3 border-b"><span class="status-active">✅ Active</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Emergency AC Repair</td><td class="p-3 border-b">Spring / Summer</td><td class="p-3 border-b"><span class="status-active">✅ Active</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">AC Tune-Up</td><td class="p-3 border-b">Spring</td><td class="p-3 border-b"><span class="status-paused">❌ Paused</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">New AC Installation</td><td class="p-3 border-b">Spring / Summer</td><td class="p-3 border-b"><span class="status-paused">❌ Paused</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">New Furnace Installation</td><td class="p-3 border-b">Fall / Winter</td><td class="p-3 border-b"><span class="status-paused">❌ Paused</span></td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: TECHNICAL SEO & GOALS -->
+            <!-- RIGHT COLUMN: LOCAL SEO & GOALS -->
             <div class="space-y-8">
+                <!-- OFF-PAGE SEO -->
+                <div class="dashboard-card">
+                     <div class="p-6">
+                        <h2 class="text-2xl font-bold mb-4">Pillar 2: Off-Page SEO (Local)</h2>
+                        <h3 class="text-xl font-semibold mb-2">A. Google Business Profile (Weekly)</h3>
+                        <div class="space-y-2">
+                            <div class="task-item flex items-center"><input id="task8" type="checkbox" class="h-4 w-4 rounded"><label for="task8" class="ml-3 text-gray-700">Publish "Update" Post</label></div>
+                            <div class="task-item flex items-center"><input id="task9" type="checkbox" class="h-4 w-4 rounded"><label for="task9" class="ml-3 text-gray-700">Add New Job Photos</label></div>
+                            <div class="task-item flex items-center"><input id="task10" type="checkbox" class="h-4 w-4 rounded"><label for="task10" class="ml-3 text-gray-700">Respond to All New Reviews</label></div>
+                        </div>
+                    </div>
+                </div>
                 <!-- TECHNICAL SEO -->
                 <div class="dashboard-card">
                      <div class="p-6">
                         <h2 class="text-2xl font-bold mb-4">Pillar 3: Technical SEO</h2>
                         <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task14" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://pagespeed.web.dev/" target="_blank" class="hover:underline text-blue-600">Run quarterly PageSpeed Insights report</a></label></div>
-                            <div class="task-item flex items-center"><input id="task15" type="checkbox" class="h-4 w-4 rounded"><label for="task15" class="ml-3 text-gray-700">Check for crawl errors monthly (GSC)</label></div>
-                            <div class="task-item flex items-center"><input id="task16" type="checkbox" class="h-4 w-4 rounded"><label for="task16" class="ml-3 text-gray-700">Ensure sitemap is up-to-date (GSC)</label></div>
+                            <div class="task-item flex items-center"><input id="task14" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://pagespeed.web.dev/" target="_blank" class="hover:underline text-blue-600">Run PageSpeed Insights report</a></label></div>
+                            <div class="task-item flex items-center"><input id="task15" type="checkbox" class="h-4 w-4 rounded"><label for="task15" class="ml-3 text-gray-700">Check for crawl errors (in GSC)</label></div>
                         </div>
                     </div>
                 </div>
@@ -143,7 +155,6 @@
                         <h3 class="text-xl font-semibold mb-2">A. Social Media (Weekly)</h3>
                         <div class="space-y-2">
                             <div class="task-item flex items-center"><input id="task17" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://www.facebook.com/" target="_blank" class="hover:underline text-blue-600">Post on Facebook (2x)</a></label></div>
-                            <div class="task-item flex items-center"><input id="task18" type="checkbox" class="h-4 w-4 rounded"><label for="task18" class="ml-3 text-gray-700">Respond to all comments & DMs</label></div>
                         </div>
                         <h3 class="text-xl font-semibold mt-6 mb-2">B. Email Marketing (Monthly)</h3>
                         <div class="space-y-2">
@@ -156,11 +167,10 @@
                      <div class="p-6">
                         <h2 class="text-2xl font-bold mb-4">🎯 Q4 2025 Goals</h2>
                         <ul class="list-disc list-inside space-y-2 text-gray-700">
-                           <li>Publish 3 new blog posts.</li>
-                           <li>Achieve a 15% increase in organic clicks to service area pages.</li>
-                           <li>Generate 10 new 5-star reviews on Google Business Profile.</li>
-                           <li>Launch "Furnace Tune-Up" Google Ads campaign in October.</li>
-                           <li>Grow Facebook page likes by 50.</li>
+                           <li>Publish 2 new blog posts.</li>
+                           <li>Generate 15 qualified leads from Google Ads.</li>
+                           <li>Achieve a Cost Per Lead of under $75.</li>
+                           <li>Generate 10 new 5-star reviews on Google.</li>
                         </ul>
                     </div>
                 </div>
