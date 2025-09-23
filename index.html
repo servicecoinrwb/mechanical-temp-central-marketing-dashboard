@@ -89,7 +89,7 @@
                                     <tr><th class="p-3 border-b">City</th><th class="p-3 border-b">URL</th><th class="p-3 border-b">Status</th></tr>
                                 </thead>
                                 <tbody id="service-pages-table-body">
-                                    <!-- Cities will be loaded here by JavaScript from Firestore -->
+                                    <!-- Cities will be loaded here by JavaScript -->
                                 </tbody>
                             </table>
                         </div>
@@ -100,7 +100,7 @@
 
                         <h3 class="text-xl font-semibold mt-6 mb-2"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages/64bafe92999de952790fe6fb" target="_blank" class="text-blue-600 hover:underline">B. Content Strategy: Blog / Resource Center</a></h3>
                         <div class="space-y-2" id="blog-post-list">
-                             <!-- Blog posts will be loaded here by JavaScript from Firestore -->
+                             <!-- Blog posts will be loaded here by JavaScript -->
                         </div>
                          <div class="mt-4 flex space-x-2">
                             <input type="text" id="new-blog-post" placeholder="Enter new blog post title..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
@@ -140,19 +140,19 @@
                                         <td class="p-3 border-b">Fall / Winter</td>
                                         <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
                                     </tr>
-                                    <tr class="hover:bg-gray-50">
+                                     <tr class="hover:bg-gray-50">
                                         <td class="p-3 border-b">New Furnace Installation</td>
                                         <td class="p-3 border-b">Fall / Winter</td>
                                         <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
                                     </tr>
                                     <tr class="hover:bg-gray-50">
-                                        <td class="p-3 border-b">AC Tune-Up</td>
-                                        <td class="p-3 border-b">Spring</td>
+                                        <td class="p-3 border-b">Emergency AC Repair</td>
+                                        <td class="p-3 border-b">Spring / Summer</td>
                                         <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
                                     </tr>
                                     <tr class="hover:bg-gray-50">
-                                        <td class="p-3 border-b">Emergency AC Repair</td>
-                                        <td class="p-3 border-b">Spring / Summer</td>
+                                        <td class="p-3 border-b">AC Tune-Up</td>
+                                        <td class="p-3 border-b">Spring</td>
                                         <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
                                     </tr>
                                     <tr class="hover:bg-gray-50">
@@ -237,47 +237,100 @@
         </div>
     </div>
 
-    <script type="module">
-        // Firebase Imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
 
-        // --- GLOBAL FIREBASE VARIABLES ---
-        let db, auth, dashboardDocRef;
+        // --- DATA PERSISTENCE USING LOCALSTORAGE ---
 
-        // --- DATA RENDERING FUNCTIONS ---
-        
-        const renderServicePages = (pages = []) => {
+        const saveState = () => {
+            // 1. Save Service Pages
+            const servicePages = [];
+            document.querySelectorAll('#service-pages-table-body tr').forEach(row => {
+                const city = row.cells[0].textContent;
+                servicePages.push({ city });
+            });
+            localStorage.setItem('dashboard_servicePages', JSON.stringify(servicePages));
+
+            // 2. Save Blog Posts
+            const blogPosts = [];
+            document.querySelectorAll('#blog-post-list .task-item').forEach(item => {
+                const title = item.querySelector('a').textContent;
+                const checked = item.querySelector('input').checked;
+                blogPosts.push({ title, checked });
+            });
+            localStorage.setItem('dashboard_blogPosts', JSON.stringify(blogPosts));
+
+            // 3. Save Checkboxes
+            const checkboxStates = {};
+            document.querySelectorAll('.task-checkbox').forEach(box => {
+                checkboxStates[box.id] = box.checked;
+            });
+            localStorage.setItem('dashboard_checkboxStates', JSON.stringify(checkboxStates));
+
+            // 4. Save Ad Group Statuses
+            const adGroupStatuses = {};
+            document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
+                const adGroupName = select.closest('tr').cells[0].textContent;
+                adGroupStatuses[adGroupName] = select.value;
+            });
+            localStorage.setItem('dashboard_adGroupStatuses', JSON.stringify(adGroupStatuses));
+             console.log("State saved to localStorage!");
+        };
+
+        const loadState = () => {
+            // 1. Load Service Pages
+            const savedPages = JSON.parse(localStorage.getItem('dashboard_servicePages')) || [
+                { city: 'Dearborn' }, { city: 'Southfield' }, { city: 'Novi' },
+            ];
+            renderServicePages(savedPages);
+
+            // 2. Load Blog Posts
+            const savedPosts = JSON.parse(localStorage.getItem('dashboard_blogPosts')) || [
+                { title: 'How to Prepare Your Furnace for a Michigan Winter', checked: false },
+                { title: "Is My AC Ready for Michigan's Humid Summers?", checked: false },
+            ];
+            renderBlogPosts(savedPosts);
+
+            // 3. Load Checkboxes
+            const savedCheckboxes = JSON.parse(localStorage.getItem('dashboard_checkboxStates')) || {};
+            renderCheckboxes(savedCheckboxes);
+
+            // 4. Load Ad Group Statuses
+            const savedAdGroups = JSON.parse(localStorage.getItem('dashboard_adGroupStatuses')) || {};
+            renderAdGroups(savedAdGroups);
+             console.log("State loaded from localStorage!");
+        };
+
+        // --- RENDERING FUNCTIONS ---
+        const renderServicePages = (pages) => {
             const tableBody = document.getElementById('service-pages-table-body');
-            tableBody.innerHTML = ''; // Clear existing rows before rendering
+            tableBody.innerHTML = '';
             pages.forEach(page => {
-                 const newRow = document.createElement('tr');
-                 newRow.classList.add('hover:bg-gray-50');
-                 const slug = page.city.toLowerCase().replace(/\s+/g, '-');
-                 const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
-                 newRow.innerHTML = `<td class="p-3 border-b">${page.city}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
-                 tableBody.appendChild(newRow);
+                const newRow = document.createElement('tr');
+                newRow.classList.add('hover:bg-gray-50');
+                const slug = page.city.toLowerCase().replace(/\s+/g, '-');
+                const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
+                newRow.innerHTML = `<td class="p-3 border-b">${page.city}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
+                tableBody.appendChild(newRow);
             });
         };
 
-        const renderBlogPosts = (posts = []) => {
+        const renderBlogPosts = (posts) => {
             const blogList = document.getElementById('blog-post-list');
-            blogList.innerHTML = ''; // Clear existing posts
+            blogList.innerHTML = '';
             posts.forEach(post => {
                 const newItem = document.createElement('div');
                 newItem.classList.add('task-item', 'flex', 'items-center');
-                const newId = 'task-blog-' + post.title.replace(/\s+/g, '-');
-                const checkedAttr = post.checked ? 'checked' : '';
-                newItem.innerHTML = `<input id="${newId}" type="checkbox" class="h-4 w-4 rounded task-checkbox" ${checkedAttr}><label class="ml-3 text-gray-700"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages/64bafe92999de952790fe6fb" target="_blank" class="hover:underline text-blue-600">${post.title}</a></label>`;
+                const newId = 'task-blog-' + post.title.replace(/\s+/g, '-').toLowerCase();
+                newItem.innerHTML = `<input id="${newId}" type="checkbox" class="h-4 w-4 rounded task-checkbox" ${post.checked ? 'checked' : ''}><label class="ml-3 text-gray-700"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages/64bafe92999de952790fe6fb" target="_blank" class="hover:underline text-blue-600">${post.title}</a></label>`;
                 blogList.appendChild(newItem);
             });
-             // Re-attach listeners after rendering
+            // Re-attach listeners after rendering
             document.querySelectorAll('#blog-post-list .task-checkbox').forEach(el => el.addEventListener('change', saveState));
         };
-        
-        const renderCheckboxes = (states = {}) => {
-             for (const id in states) {
+
+        const renderCheckboxes = (states) => {
+            for (const id in states) {
                 const checkbox = document.getElementById(id);
                 if (checkbox) checkbox.checked = states[id];
             }
@@ -285,14 +338,10 @@
 
         const updateSelectAppearance = (selectElement) => {
             selectElement.classList.remove('status-active', 'status-paused');
-            if (selectElement.value === 'active') {
-                selectElement.classList.add('status-active');
-            } else {
-                selectElement.classList.add('status-paused');
-            }
+            selectElement.classList.add(selectElement.value === 'active' ? 'status-active' : 'status-paused');
         };
 
-        const renderAdGroups = (statuses = {}) => {
+        const renderAdGroups = (statuses) => {
             document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
                 const adGroupName = select.closest('tr').cells[0].textContent;
                 if (statuses[adGroupName]) {
@@ -301,115 +350,16 @@
                 updateSelectAppearance(select);
             });
         };
-
-        const renderDashboard = (data = {}) => {
-            renderServicePages(data.servicePages);
-            renderBlogPosts(data.blogPosts);
-            renderCheckboxes(data.checkboxStates);
-            renderAdGroups(data.adGroupStatuses);
-        };
         
-        // --- DATA PERSISTENCE (FIRESTORE) ---
-
-        const saveState = async () => {
-            if (!dashboardDocRef) return console.error("Firestore is not initialized.");
-            
-            // 1. Get Service Pages
-            const servicePages = [];
-            document.querySelectorAll('#service-pages-table-body tr').forEach(row => {
-                servicePages.push({ city: row.cells[0].textContent });
-            });
-
-            // 2. Get Blog Posts
-            const blogPosts = [];
-            document.querySelectorAll('#blog-post-list .task-item').forEach(item => {
-                blogPosts.push({
-                    title: item.querySelector('a').textContent,
-                    checked: item.querySelector('input').checked
-                });
-            });
-
-            // 3. Get Checkboxes
-            const checkboxStates = {};
-            document.querySelectorAll('.task-checkbox').forEach(box => {
-                checkboxStates[box.id] = box.checked;
-            });
-            
-            // 4. Get Ad Group Statuses
-            const adGroupStatuses = {};
-            document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
-                const adGroupName = select.closest('tr').cells[0].textContent;
-                adGroupStatuses[adGroupName] = select.value;
-            });
-            
-            const fullState = { servicePages, blogPosts, checkboxStates, adGroupStatuses };
-
-            try {
-                await setDoc(dashboardDocRef, fullState);
-                 console.log("Dashboard state saved to Firestore.");
-            } catch (error) {
-                console.error("Error saving state to Firestore: ", error);
-            }
-        };
-
-
-        // --- INITIALIZATION ---
-        
-        async function initialize() {
-            // These variables are provided by the environment.
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "DEMO", authDomain: "DEMO", projectId: "DEMO" };
-            
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            setLogLevel('debug'); // Use 'debug' for verbose logging, 'silent' to turn off
-
-            try {
-                if (typeof __initial_auth_token !== 'undefined') {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                console.log("Firebase Auth successful. User UID:", auth.currentUser.uid);
-                
-                // Define the document reference after successful authentication
-                dashboardDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'dashboardState', 'main');
-                
-                // Set up the real-time listener
-                onSnapshot(dashboardDocRef, (doc) => {
-                    if (doc.exists()) {
-                        console.log("Received real-time update from Firestore.");
-                        renderDashboard(doc.data());
-                    } else {
-                        console.log("No data in Firestore, initializing with default state.");
-                        // If no doc, save the initial state to create it.
-                        saveState(); 
-                    }
-                }, (error) => {
-                    console.error("Error listening to dashboard state: ", error);
-                });
-
-            } catch (error) {
-                console.error("Firebase initialization or auth failed:", error);
-            }
-
-            setupEventListeners();
-        }
-
         // --- EVENT LISTENERS SETUP ---
         function setupEventListeners() {
             document.getElementById('add-city-btn').addEventListener('click', () => {
                 const cityNameInput = document.getElementById('new-city-name');
                 const cityName = cityNameInput.value.trim();
                 if (cityName) {
-                    const tableBody = document.getElementById('service-pages-table-body');
-                    const newRow = document.createElement('tr');
-                    newRow.classList.add('hover:bg-gray-50');
-                    const slug = cityName.toLowerCase().replace(/\s+/g, '-');
-                    const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
-                    newRow.innerHTML = `<td class="p-3 border-b">${cityName}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
-                    tableBody.appendChild(newRow);
+                    const currentPages = JSON.parse(localStorage.getItem('dashboard_servicePages')) || [];
+                    currentPages.push({ city: cityName });
+                    renderServicePages(currentPages);
                     cityNameInput.value = '';
                     saveState();
                 }
@@ -419,12 +369,9 @@
                 const blogPostInput = document.getElementById('new-blog-post');
                 const postTitle = blogPostInput.value.trim();
                 if (postTitle) {
-                    // Just add to UI, let render function handle it from snapshot
-                    const blogList = document.getElementById('blog-post-list');
-                    const newItem = document.createElement('div');
-                    newItem.classList.add('task-item', 'flex', 'items-center');
-                    newItem.innerHTML = `<input type="checkbox" class="h-4 w-4 rounded task-checkbox"><label class="ml-3 text-gray-700"><a href="#" class="hover:underline text-blue-600">${postTitle}</a></label>`;
-                    blogList.appendChild(newItem);
+                    const currentPosts = JSON.parse(localStorage.getItem('dashboard_blogPosts')) || [];
+                    currentPosts.push({ title: postTitle, checked: false });
+                    renderBlogPosts(currentPosts);
                     blogPostInput.value = '';
                     saveState();
                 }
@@ -497,8 +444,10 @@
         });
 
         // --- START THE APP ---
-        initialize();
-
+        loadState();
+        setupEventListeners();
+    });
     </script>
 </body>
 </html>
+
