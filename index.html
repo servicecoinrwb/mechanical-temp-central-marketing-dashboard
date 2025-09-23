@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechanical Temp - Marketing Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .dashboard-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        .dashboard-header {
+            background-color: #1A2D4E;
+            color: white;
+        }
+        .status-live {
+            background-color: #dcfce7;
+            color: #166534;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .task-item:has(input:checked) label {
+            text-decoration: line-through;
+            color: #6b7280;
+        }
+        th {
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- HEADER -->
+        <header class="dashboard-header p-6 rounded-t-lg flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold">Mechanical Temp</h1>
+                <p class="text-lg text-gray-300">Central Marketing Dashboard</p>
+            </div>
+            <div class="flex space-x-4 mt-4 md:mt-0">
+                <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amechanicaltemp.com" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Google Search Console</a>
+                <a href="https://www.google.com/search?q=mechanical+temp&rlz=1C1SQJL_enUS786US786&oq=mechanical+temp&gs_lcrp=EgZjaHJvbWUqDAgAECMYJxiABBiKBTIMCAAQIxgnGIAEGIoFMhAIARAuGK8BGMcBGIAEGI4FMgcIAhAAGIAEMgcIAxAAGIAEMgYIBBBFGEEyBggFEEUYPTIGCAYQRRhBMgYIBxBFGEHSAQgzODg1ajBqN6gCCLACAfEFHzkU-rb4cPnxBR85FPq2-HD5&sourceid=chrome&ie=UTF-8" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Google Business Profile</a>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+            <!-- LEFT COLUMN: ON-PAGE SEO -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="dashboard-card">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold mb-4">Pillar 1: On-Page SEO</h2>
+                        <!-- Local Service Pages -->
+                        <h3 class="text-xl font-semibold mb-2">A. Local Service Area Pages</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr>
+                                        <th class="p-3 border-b">City</th>
+                                        <th class="p-3 border-b">URL</th>
+                                        <th class="p-3 border-b">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Dearborn</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/dearborn" target="_blank" class="text-blue-600 hover:underline">/service-areas/dearborn</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Southfield</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/southfield" target="_blank" class="text-blue-600 hover:underline">/service-areas/southfield</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Novi</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/novi" target="_blank" class="text-blue-600 hover:underline">/service-areas/novi</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Redford</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/redford" target="_blank" class="text-blue-600 hover:underline">/service-areas/redford</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Farmington Hills</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/farmington-hills" target="_blank" class="text-blue-600 hover:underline">/service-areas/farmington-hills</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
+                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Royal Oak</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/royal-oak" target="_blank" class="text-blue-600 hover:underline">/service-areas/royal-oak</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Blog Content Strategy -->
+                        <h3 class="text-xl font-semibold mt-6 mb-2">B. Content Strategy: Blog / Resource Center</h3>
+                        <div class="space-y-2">
+                            <div class="task-item flex items-center"><input id="task1" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task1" class="ml-3 text-gray-700">How to Prepare Your Furnace for a Michigan Winter</label></div>
+                            <div class="task-item flex items-center"><input id="task2" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task2" class="ml-3 text-gray-700">Is My AC Ready for Michigan's Humid Summers?</label></div>
+                            <div class="task-item flex items-center"><input id="task3" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task3" class="ml-3 text-gray-700">Why is My DTE/Consumers Energy Bill So High?</label></div>
+                            <div class="task-item flex items-center"><input id="task4" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task4" class="ml-3 text-gray-700">The Best Smart Thermostats for Metro Detroit Homes</label></div>
+                        </div>
+
+                        <!-- Service Page Expansion -->
+                        <h3 class="text-xl font-semibold mt-6 mb-2">C. Service Page Expansion</h3>
+                         <div class="space-y-2">
+                            <div class="task-item flex items-center"><input id="task5" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task5" class="ml-3 text-gray-700">Create page for "Furnace Repair"</label></div>
+                            <div class="task-item flex items-center"><input id="task6" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task6" class="ml-3 text-gray-700">Create page for "Air Conditioner Installation"</label></div>
+                            <div class="task-item flex items-center"><input id="task7" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><label for="task7" class="ml-3 text-gray-700">Create page for "HVAC Maintenance"</label></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: OFF-PAGE SEO & GOALS -->
+            <div class="space-y-8">
+                <div class="dashboard-card">
+                     <div class="p-6">
+                        <h2 class="text-2xl font-bold mb-4">Pillar 2: Off-Page SEO</h2>
+                        <h3 class="text-xl font-semibold mb-2">A. Google Business Profile Management</h3>
+                        <div class="space-y-2">
+                            <div class="task-item flex items-center"><input id="task8" type="checkbox" class="h-4 w-4 rounded"><label for="task8" class="ml-3 text-gray-700">Publish Weekly Post</label></div>
+                            <div class="task-item flex items-center"><input id="task9" type="checkbox" class="h-4 w-4 rounded"><label for="task9" class="ml-3 text-gray-700">Add New Photos</label></div>
+                            <div class="task-item flex items-center"><input id="task10" type="checkbox" class="h-4 w-4 rounded"><label for="task10" class="ml-3 text-gray-700">Respond to New Reviews</label></div>
+                        </div>
+
+                        <h3 class="text-xl font-semibold mt-6 mb-2">C. Local Citations</h3>
+                        <div class="space-y-2">
+                            <div class="task-item flex items-center"><input id="task11" type="checkbox" class="h-4 w-4 rounded"><label for="task11" class="ml-3 text-gray-700">Check Yelp Profile</label></div>
+                            <div class="task-item flex items-center"><input id="task12" type="checkbox" class="h-4 w-4 rounded"><label for="task12" class="ml-3 text-gray-700">Check HomeAdvisor/Angi Profile</label></div>
+                            <div class="task-item flex items-center"><input id="task13" type="checkbox" class="h-4 w-4 rounded"><label for="task13" class="ml-3 text-gray-700">Check BBB Profile</label></div>
+                        </div>
+                    </div>
+                </div>
+
+                 <div class="dashboard-card">
+                     <div class="p-6">
+                        <h2 class="text-2xl font-bold mb-4">🎯 Q4 2025 Goals</h2>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700">
+                           <li>Publish 3 new blog posts from the content strategy list.</li>
+                           <li>Achieve a 15% increase in organic clicks to service area pages.</li>
+                           <li>Generate 10 new 5-star reviews on Google Business Profile.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+
