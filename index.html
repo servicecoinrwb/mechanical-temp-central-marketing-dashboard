@@ -31,6 +31,7 @@
             text-align: center;
         }
         .status-live { background-color: #dcfce7; color: #166534; }
+        .status-draft { background-color: #fef9c3; color: #854d0e; }
         
         .status-select {
             -webkit-appearance: none;
@@ -58,37 +59,26 @@
         .loading-dots div:nth-child(2) { animation-delay: 0.2s; }
         .loading-dots div:nth-child(3) { animation-delay: 0.4s; }
         @keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
-        #db-status {
-            transition: all 0.3s ease;
-        }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div class="max-w-7xl mx-auto">
-        <!-- HEADER -->
         <header class="dashboard-header p-6 rounded-t-lg flex flex-col md:flex-row justify-between items-center">
             <div>
                 <h1 class="text-3xl font-bold">Mechanical Temp</h1>
                 <p class="text-lg text-gray-300">Central Marketing Dashboard</p>
             </div>
-             <div class="flex items-center space-x-4">
-                <div id="db-status" class="bg-red-500 text-white text-sm font-semibold py-1 px-3 rounded-full">
-                    Connecting...
-                </div>
-                <div class="flex flex-wrap justify-center gap-2 mt-4 md:mt-0">
-                    <a href="https://piccolo-spinach-k6p6.squarespace.com/config/" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Website Admin</a>
-                    <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amechanicaltemp.com" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Search Console</a>
-                    <a href="https://www.google.com/search?q=mechanical+temp&rlz=1C1SQJL_enUS786US786&oq=mechanical+temp&gs_lcrp=EgZjaHJvbWUqDAgAECMYJxiABBiKBTIMCAAQIxgnGIAEGIoFMhAIARAuGK8BGMcBGIAEGI4FMgcIAhAAGIAEMgcIAxAAGIAEMgYIBBBFGEEyBggFEEUYPTIGCAYQRRhBMgYIBxBFGEHSAQgzODg1ajBqN6gCCLACAfEFHzkU-rb4cPnxBR85FPq2-HD5&sourceid=chrome&ie=UTF-8" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Business Profile</a>
-                     <a href="https://ads.google.com/aw/campaigns" target="_blank" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition">Google Ads</a>
-                </div>
+            <div class="flex flex-wrap justify-center gap-2 mt-4 md:mt-0">
+                <a href="https://piccolo-spinach-k6p6.squarespace.com/config/" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Website Admin</a>
+                <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amechanicaltemp.com" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Search Console</a>
+                <a href="https://www.google.com/search?q=mechanical+temp" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Business Profile</a>
+                <a href="https://ads.google.com/aw/campaigns" target="_blank" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition">Google Ads</a>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-            <!-- LEFT COLUMN: SEO & CONTENT -->
             <div class="lg:col-span-2 space-y-8">
-                <!-- ON-PAGE SEO -->
                 <div class="dashboard-card">
                     <div class="p-6">
                         <h2 class="text-2xl font-bold mb-4">Pillar 1: On-Page SEO (Organic)</h2>
@@ -99,7 +89,7 @@
                                     <tr><th class="p-3 border-b">City</th><th class="p-3 border-b">URL</th><th class="p-3 border-b">Status</th></tr>
                                 </thead>
                                 <tbody id="service-pages-table-body">
-                                    <!-- Rows will be dynamically added by JavaScript -->
+                                    <!-- Cities will be loaded here by JavaScript from Firestore -->
                                 </tbody>
                             </table>
                         </div>
@@ -108,9 +98,9 @@
                             <button id="add-city-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Add City</button>
                         </div>
 
-                        <h3 class="text-xl font-semibold mt-6 mb-2"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages" target="_blank" class="text-blue-600 hover:underline">B. Content Strategy: Blog / Resource Center</a></h3>
+                        <h3 class="text-xl font-semibold mt-6 mb-2"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages/64bafe92999de952790fe6fb" target="_blank" class="text-blue-600 hover:underline">B. Content Strategy: Blog / Resource Center</a></h3>
                         <div class="space-y-2" id="blog-post-list">
-                           <!-- Blog posts will be dynamically added by JavaScript -->
+                             <!-- Blog posts will be loaded here by JavaScript from Firestore -->
                         </div>
                          <div class="mt-4 flex space-x-2">
                             <input type="text" id="new-blog-post" placeholder="Enter new blog post title..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
@@ -118,15 +108,14 @@
                         </div>
                     </div>
                 </div>
-                <!-- GOOGLE ADS -->
                 <div class="dashboard-card">
                     <div class="p-6">
                         <h2 class="text-2xl font-bold mb-4">Pillar 5: Google Ads (Paid Search)</h2>
                          <h3 class="text-xl font-semibold mb-2">A. Campaign Foundation</h3>
                         <div class="space-y-2">
-                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-1" class="task-checkbox"><label for="task-foundation-1" class="ml-3 text-gray-700">High-Converting Landing Page Live (<a href="https://www.mechanicaltemp.site" target="_blank" class="text-blue-600 hover:underline">mechanicaltemp.site</a>)</label></div>
-                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-2" class="task-checkbox"><label for="task-foundation-2" class="ml-3 text-gray-700">Conversion Tracking Installed (Calls & Forms)</label></div>
-                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-3" class="task-checkbox"><label for="task-foundation-3" class="ml-3 text-gray-700">LSA Campaign Paused to focus budget</label></div>
+                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-1" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-1" class="ml-3 text-gray-700">High-Converting Landing Page Live (<a href="https://www.mechanicaltemp.site" target="_blank" class="text-blue-600 hover:underline">mechanicaltemp.site</a>)</label></div>
+                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-2" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-2" class="ml-3 text-gray-700">Conversion Tracking Installed (Calls & Forms)</label></div>
+                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-3" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-3" class="ml-3 text-gray-700">LSA Campaign Paused to focus budget</label></div>
                         </div>
                          <h3 class="text-xl font-semibold mt-6 mb-2">B. Active Campaign Management (Weekly Tasks)</h3>
                         <div class="space-y-2">
@@ -136,12 +125,41 @@
                         </div>
                          <h3 class="text-xl font-semibold mt-6 mb-2">C. Seasonal Ad Group Status</h3>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
+                            <table class="w-full text-left border-collapse" id="ad-groups-table">
                                 <thead>
                                     <tr><th class="p-3 border-b">Ad Group</th><th class="p-3 border-b">Recommended Season</th><th class="p-3 border-b">Status</th></tr>
                                 </thead>
-                                <tbody id="ad-group-table-body">
-                                    <!-- Ad Groups will be dynamically added by JavaScript -->
+                                <tbody>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">Furnace Maintenance</td>
+                                        <td class="p-3 border-b">Fall / Winter</td>
+                                        <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">Emergency Furnace Repair</td>
+                                        <td class="p-3 border-b">Fall / Winter</td>
+                                        <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">Emergency AC Repair</td>
+                                        <td class="p-3 border-b">Spring / Summer</td>
+                                        <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">AC Tune-Up</td>
+                                        <td class="p-3 border-b">Spring</td>
+                                        <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">New AC Installation</td>
+                                        <td class="p-3 border-b">Spring / Summer</td>
+                                        <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">New Furnace Installation</td>
+                                        <td class="p-3 border-b">Fall / Winter</td>
+                                        <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -149,14 +167,15 @@
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: LOCAL SEO & GOALS -->
             <div class="space-y-8">
-                <!-- AI MARKETING ASSISTANT -->
                 <div class="dashboard-card">
                     <div class="p-6">
                         <h2 class="text-2xl font-bold mb-4">Pillar 6: AI Marketing Assistant</h2>
                         <div class="chat-history p-4 bg-gray-100 rounded-lg border" id="chat-history">
-                           <!-- Chat history will be dynamically added by JavaScript -->
+                           <div class="ai-msg p-3 rounded-lg mb-2">
+                                <p class="font-semibold text-gray-800">Hello!</p>
+                                <p class="text-gray-700">How can I help you with your marketing today? Ask me to write ad copy, suggest blog topics, or draft a social media post.</p>
+                           </div>
                         </div>
                         <div class="mt-4 flex space-x-2">
                             <input type="text" id="chat-input" placeholder="Ask for a blog post idea..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
@@ -165,242 +184,234 @@
                     </div>
                 </div>
 
-                <!-- OFF-PAGE SEO -->
                 <div class="dashboard-card">
-                     <div class="p-6">
-                        <h2 class="text-2xl font-bold mb-4">Pillar 2: Off-Page SEO (Local)</h2>
-                        <h3 class="text-xl font-semibold mb-2">A. Google Business Profile (Weekly)</h3>
-                        <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task-gbp-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-gbp-1" class="ml-3 text-gray-700">Publish "Update" Post</label></div>
-                            <div class="task-item flex items-center"><input id="task-gbp-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-gbp-2" class="ml-3 text-gray-700">Add New Job Photos</label></div>
-                            <div class="task-item flex items-center"><input id="task-gbp-3" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-gbp-3" class="ml-3 text-gray-700">Respond to All New Reviews</label></div>
-                        </div>
-                    </div>
+                       <div class="p-6">
+                            <h2 class="text-2xl font-bold mb-4">Pillar 2: Off-Page SEO (Local)</h2>
+                            <h3 class="text-xl font-semibold mb-2">A. Google Business Profile (Weekly)</h3>
+                            <div class="space-y-2">
+                                <div class="task-item flex items-center"><input id="task-gbp-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-gbp-1" class="ml-3 text-gray-700">Publish "Update" Post</label></div>
+                                <div class="task-item flex items-center"><input id="task-gbp-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-gbp-2" class="ml-3 text-gray-700">Add New Job Photos</label></div>
+                                <div class="task-item flex items-center"><input id="task-gbp-3" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-gbp-3" class="ml-3 text-gray-700">Respond to All New Reviews</label></div>
+                            </div>
+                       </div>
                 </div>
-                <!-- TECHNICAL SEO -->
                 <div class="dashboard-card">
-                     <div class="p-6">
-                        <h2 class="text-2xl font-bold mb-4">Pillar 3: Technical SEO</h2>
-                        <h3 class="text-xl font-semibold mb-2">A. Monthly Health Check</h3>
-                        <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task-tech-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label class="ml-3 text-gray-700"><a href="https://pagespeed.web.dev/" target="_blank" class="hover:underline text-blue-600">Run PageSpeed Insights report</a></label></div>
-                            <div class="task-item flex items-center"><input id="task-tech-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-tech-2" class="ml-3 text-gray-700">Check for crawl errors (in GSC)</label></div>
-                        </div>
-                        <h3 class="text-xl font-semibold mt-6 mb-2">B. How-To Guides & Summaries</h3>
-                        <div class="text-sm text-gray-600">
-                           <p><strong>How to Check for Crawl Errors:</strong><br> 1. Go to Google Search Console (GSC). <br>2. In the left menu, click 'Indexing' > 'Pages'. <br>3. Scroll down to the "Why pages aren't indexed" section. <br>4. Look for "Not found (404)" errors. If important pages are listed, set up a redirect in Squarespace.</p>
-                        </div>
-                    </div>
+                       <div class="p-6">
+                            <h2 class="text-2xl font-bold mb-4">Pillar 3: Technical SEO</h2>
+                            <h3 class="text-xl font-semibold mb-2">A. Monthly Health Check</h3>
+                            <div class="space-y-2">
+                                <div class="task-item flex items-center"><input id="task-tech-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label class="ml-3 text-gray-700"><a href="https://pagespeed.web.dev/" target="_blank" class="hover:underline text-blue-600">Run PageSpeed Insights report</a></label></div>
+                                <div class="task-item flex items-center"><input id="task-tech-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-tech-2" class="ml-3 text-gray-700">Check for crawl errors (in GSC)</label></div>
+                            </div>
+                            <h3 class="text-xl font-semibold mt-6 mb-2">B. How-To Guides & Summaries</h3>
+                            <div class="text-sm text-gray-600">
+                               <p><strong>How to Check for Crawl Errors:</strong><br> 1. Go to Google Search Console (GSC). <br>2. In the left menu, click 'Indexing' > 'Pages'. <br>3. Scroll down to the "Why pages aren't indexed" section. <br>4. Look for "Not found (404)" errors. If important pages are listed, set up a redirect in Squarespace.</p>
+                            </div>
+                       </div>
                 </div>
-                <!-- SOCIAL & EMAIL -->
                 <div class="dashboard-card">
-                     <div class="p-6">
-                        <h2 class="text-2xl font-bold mb-4">Pillar 4: Social & Email</h2>
-                        <h3 class="text-xl font-semibold mb-2">A. Social Media (Weekly)</h3>
-                        <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task-social-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label class="ml-3 text-gray-700"><a href="https://www.facebook.com/mechanicaltemp" target="_blank" class="hover:underline text-blue-600">Post on Facebook (2x)</a></label></div>
-                        </div>
-                        <h3 class="text-xl font-semibold mt-6 mb-2">B. Email Marketing (Monthly)</h3>
-                        <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task-email-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-email-1" class="ml-3 text-gray-700">Send newsletter with tips & offers</label></div>
-                        </div>
-                    </div>
+                       <div class="p-6">
+                            <h2 class="text-2xl font-bold mb-4">Pillar 4: Social & Email</h2>
+                            <h3 class="text-xl font-semibold mb-2">A. Social Media (Weekly)</h3>
+                            <div class="space-y-2">
+                                <div class="task-item flex items-center"><input id="task-social-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label class="ml-3 text-gray-700"><a href="https://www.facebook.com/mechanicaltemp" target="_blank" class="hover:underline text-blue-600">Post on Facebook (2x)</a></label></div>
+                            </div>
+                            <h3 class="text-xl font-semibold mt-6 mb-2">B. Email Marketing (Monthly)</h3>
+                            <div class="space-y-2">
+                                <div class="task-item flex items-center"><input id="task-email-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-email-1" class="ml-3 text-gray-700">Send newsletter with tips & offers</label></div>
+                            </div>
+                       </div>
                 </div>
-                 <!-- GOALS -->
                  <div class="dashboard-card">
-                     <div class="p-6">
-                        <h2 class="text-2xl font-bold mb-4">🎯 Q4 2025 Goals</h2>
-                        <ul class="list-disc list-inside space-y-2 text-gray-700">
-                           <li>Publish 2 new blog posts.</li>
-                           <li>Generate 15 qualified leads from Google Ads.</li>
-                           <li>Achieve a Cost Per Lead of under $75.</li>
-                           <li>Generate 10 new 5-star reviews on Google.</li>
-                        </ul>
-                    </div>
+                       <div class="p-6">
+                            <h2 class="text-2xl font-bold mb-4">🎯 Q4 2025 Goals</h2>
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                               <li>Publish 2 new blog posts.</li>
+                               <li>Generate 15 qualified leads from Google Ads.</li>
+                               <li>Achieve a Cost Per Lead of under $75.</li>
+                               <li>Generate 10 new 5-star reviews on Google.</li>
+                            </ul>
+                       </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- 1. CONFIG & INITIALIZATION ---
-        // These variables are placeholders and will be provided by the environment.
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-dashboard';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // --- GLOBAL FIREBASE VARIABLES ---
+        let db, auth, dashboardDocRef;
 
-        let db, auth, userId, docRef;
-        let dashboardState = {}; // Local state object
+        // --- DATA RENDERING FUNCTIONS ---
         
-        // --- Default State for a new dashboard ---
-        const defaultState = {
-            servicePages: [
-                { city: 'Dearborn', slug: 'dearborn' }, { city: 'Southfield', slug: 'southfield' },
-                { city: 'Novi', slug: 'novi' }, { city: 'Redford', slug: 'redford' },
-                { city: 'Farmington Hills', slug: 'farmington-hills' }, { city: 'Royal Oak', slug: 'royal-oak' }
-            ],
-            blogPosts: [
-                { id: 'blog1', title: 'How to Prepare Your Furnace for a Michigan Winter', checked: false },
-                { id: 'blog2', title: "Is My AC Ready for Michigan's Humid Summers?", checked: false }
-            ],
-            adGroupStatuses: {
-                'Furnace Maintenance': 'active', 'Emergency Furnace Repair': 'active', 'Emergency AC Repair': 'paused',
-                'AC Tune-Up': 'paused', 'New AC Installation': 'paused', 'New Furnace Installation': 'paused'
-            },
-            taskCheckboxes: {},
-            chatHistory: [{ from: 'ai', text: '<p class="font-semibold text-gray-800">Hello!</p><p class="text-gray-700">How can I help you with your marketing today? Ask me to write ad copy, suggest blog topics, or draft a social media post.</p>'}]
-        };
-
-        // --- 2. CORE FUNCTIONS (SAVE, LOAD, RENDER) ---
-
-        // Debounce function to prevent too many writes to Firestore
-        const debounce = (func, delay) => {
-            let timeout;
-            return function(...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), delay);
-            };
-        };
-
-        const saveData = debounce(async () => {
-            if (!docRef) return;
-            console.log("Saving data to Firestore...", dashboardState);
-            const statusIndicator = document.getElementById('db-status');
-            statusIndicator.textContent = 'Saving...';
-            statusIndicator.classList.remove('bg-green-500', 'bg-red-500');
-            statusIndicator.classList.add('bg-yellow-500');
-            try {
-                await setDoc(docRef, dashboardState, { merge: true });
-                console.log("Data saved successfully.");
-                statusIndicator.textContent = 'Data Saved';
-                statusIndicator.classList.remove('bg-yellow-500');
-                statusIndicator.classList.add('bg-green-500');
-            } catch (error) {
-                console.error("Error saving data: ", error);
-                 statusIndicator.textContent = 'Save Error';
-                statusIndicator.classList.remove('bg-yellow-500');
-                statusIndicator.classList.add('bg-red-500');
-            }
-        }, 1500); // Save data 1.5 seconds after the last change
-
-        const loadData = async () => {
-            if (!docRef) return;
-            console.log("Loading data from Firestore...");
-            try {
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    console.log("Document data:", docSnap.data());
-                    dashboardState = { ...defaultState, ...docSnap.data() };
-                } else {
-                    console.log("No such document! Creating with default state.");
-                    dashboardState = { ...defaultState };
-                    await setDoc(docRef, dashboardState); // First time save
-                }
-                renderDashboard();
-            } catch (error) {
-                console.error("Error loading data: ", error);
-            }
-        };
-
-        const renderDashboard = () => {
-            console.log("Rendering dashboard with state:", dashboardState);
-            renderServicePages();
-            renderBlogPosts();
-            renderAdGroups();
-            renderCheckboxes();
-            renderChatHistory();
-        };
-
-        // --- 3. UI RENDER FUNCTIONS ---
-        
-        const renderServicePages = () => {
+        const renderServicePages = (pages = []) => {
             const tableBody = document.getElementById('service-pages-table-body');
-            tableBody.innerHTML = '';
-            dashboardState.servicePages.forEach(page => {
+            tableBody.innerHTML = ''; // Clear existing rows before rendering
+            pages.forEach(page => {
                  const newRow = document.createElement('tr');
                  newRow.classList.add('hover:bg-gray-50');
-                 const newUrl = `https://www.mechanicaltemp.com/service-areas/${page.slug}`;
-                 newRow.innerHTML = `<td class="p-3 border-b">${page.city}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${page.slug}</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
+                 const slug = page.city.toLowerCase().replace(/\s+/g, '-');
+                 const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
+                 newRow.innerHTML = `<td class="p-3 border-b">${page.city}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
                  tableBody.appendChild(newRow);
             });
         };
 
-        const renderBlogPosts = () => {
-             const blogList = document.getElementById('blog-post-list');
-             blogList.innerHTML = '';
-             dashboardState.blogPosts.forEach(post => {
+        const renderBlogPosts = (posts = []) => {
+            const blogList = document.getElementById('blog-post-list');
+            blogList.innerHTML = ''; // Clear existing posts
+            posts.forEach(post => {
                 const newItem = document.createElement('div');
                 newItem.classList.add('task-item', 'flex', 'items-center');
-                newItem.innerHTML = `<input id="${post.id}" type="checkbox" class="h-4 w-4 rounded task-checkbox" ${post.checked ? 'checked' : ''}><label class="ml-3 text-gray-700"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages/64bafe92999de952790fe6fb" target="_blank" class="hover:underline text-blue-600">${post.title}</a></label>`;
+                const newId = 'task-blog-' + post.title.replace(/\s+/g, '-');
+                const checkedAttr = post.checked ? 'checked' : '';
+                newItem.innerHTML = `<input id="${newId}" type="checkbox" class="h-4 w-4 rounded task-checkbox" ${checkedAttr}><label class="ml-3 text-gray-700"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages/64bafe92999de952790fe6fb" target="_blank" class="hover:underline text-blue-600">${post.title}</a></label>`;
                 blogList.appendChild(newItem);
-             });
-        };
-
-        const renderAdGroups = () => {
-            const adGroupData = [
-                { name: 'Furnace Maintenance', season: 'Fall / Winter' }, { name: 'Emergency Furnace Repair', season: 'Fall / Winter' },
-                { name: 'Emergency AC Repair', season: 'Spring / Summer' }, { name: 'AC Tune-Up', season: 'Spring' },
-                { name: 'New AC Installation', season: 'Spring / Summer' }, { name: 'New Furnace Installation', season: 'Fall / Winter' }
-            ];
-            const tableBody = document.getElementById('ad-group-table-body');
-            tableBody.innerHTML = '';
-            adGroupData.forEach(group => {
-                const status = dashboardState.adGroupStatuses[group.name] || 'paused';
-                const newRow = document.createElement('tr');
-                newRow.classList.add('hover:bg-gray-50');
-                newRow.innerHTML = `
-                    <td class="p-3 border-b">${group.name}</td>
-                    <td class="p-3 border-b">${group.season}</td>
-                    <td class="p-3 border-b">
-                        <select class="status-select ${status === 'active' ? 'status-active' : 'status-paused'}" data-group-name="${group.name}">
-                            <option value="active" ${status === 'active' ? 'selected' : ''}>✅ Active</option>
-                            <option value="paused" ${status === 'paused' ? 'selected' : ''}>❌ Paused</option>
-                        </select>
-                    </td>`;
-                tableBody.appendChild(newRow);
             });
+             // Re-attach listeners after rendering
+            document.querySelectorAll('#blog-post-list .task-checkbox').forEach(el => el.addEventListener('change', saveState));
         };
         
-        const renderCheckboxes = () => {
-            const checkboxes = document.querySelectorAll('.task-checkbox');
-            checkboxes.forEach(cb => {
-                if (dashboardState.taskCheckboxes[cb.id]) {
-                    cb.checked = true;
+        const renderCheckboxes = (states = {}) => {
+             for (const id in states) {
+                const checkbox = document.getElementById(id);
+                if (checkbox) checkbox.checked = states[id];
+            }
+        };
+
+        const updateSelectAppearance = (selectElement) => {
+            selectElement.classList.remove('status-active', 'status-paused');
+            if (selectElement.value === 'active') {
+                selectElement.classList.add('status-active');
+            } else {
+                selectElement.classList.add('status-paused');
+            }
+        };
+
+        const renderAdGroups = (statuses = {}) => {
+            document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
+                const adGroupName = select.closest('tr').cells[0].textContent;
+                if (statuses[adGroupName]) {
+                    select.value = statuses[adGroupName];
                 }
+                updateSelectAppearance(select);
             });
         };
 
-        const renderChatHistory = () => {
-            const chatHistoryEl = document.getElementById('chat-history');
-            chatHistoryEl.innerHTML = '';
-            dashboardState.chatHistory.forEach(msg => {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = `${msg.from === 'user' ? 'user-msg' : 'ai-msg'} p-3 rounded-lg mb-2`;
-                const sender = msg.from === 'user' ? 'You' : 'AI Assistant';
-                const senderColor = msg.from === 'user' ? 'text-sky-800' : 'text-gray-800';
-                msgDiv.innerHTML = `<p class="font-semibold ${senderColor}">${sender}</p><div class="text-gray-700">${msg.text}</div>`;
-                chatHistoryEl.appendChild(msgDiv);
+        const renderDashboard = (data = {}) => {
+            renderServicePages(data.servicePages);
+            renderBlogPosts(data.blogPosts);
+            renderCheckboxes(data.checkboxStates);
+            renderAdGroups(data.adGroupStatuses);
+        };
+        
+        // --- DATA PERSISTENCE (FIRESTORE) ---
+
+        const saveState = async () => {
+            if (!dashboardDocRef) return console.error("Firestore is not initialized.");
+            
+            // 1. Get Service Pages
+            const servicePages = [];
+            document.querySelectorAll('#service-pages-table-body tr').forEach(row => {
+                servicePages.push({ city: row.cells[0].textContent });
             });
-            chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+
+            // 2. Get Blog Posts
+            const blogPosts = [];
+            document.querySelectorAll('#blog-post-list .task-item').forEach(item => {
+                blogPosts.push({
+                    title: item.querySelector('a').textContent,
+                    checked: item.querySelector('input').checked
+                });
+            });
+
+            // 3. Get Checkboxes
+            const checkboxStates = {};
+            document.querySelectorAll('.task-checkbox').forEach(box => {
+                checkboxStates[box.id] = box.checked;
+            });
+            
+            // 4. Get Ad Group Statuses
+            const adGroupStatuses = {};
+            document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
+                const adGroupName = select.closest('tr').cells[0].textContent;
+                adGroupStatuses[adGroupName] = select.value;
+            });
+            
+            const fullState = { servicePages, blogPosts, checkboxStates, adGroupStatuses };
+
+            try {
+                await setDoc(dashboardDocRef, fullState);
+                 console.log("Dashboard state saved to Firestore.");
+            } catch (error) {
+                console.error("Error saving state to Firestore: ", error);
+            }
         };
 
-        // --- 4. EVENT LISTENERS ---
-        const setupEventListeners = () => {
-            // Pillar 1
+
+        // --- INITIALIZATION ---
+        
+        async function initialize() {
+            // These variables are provided by the environment.
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "DEMO", authDomain: "DEMO", projectId: "DEMO" };
+            
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            setLogLevel('debug'); // Use 'debug' for verbose logging, 'silent' to turn off
+
+            try {
+                if (typeof __initial_auth_token !== 'undefined') {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                console.log("Firebase Auth successful. User UID:", auth.currentUser.uid);
+                
+                // Define the document reference after successful authentication
+                dashboardDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'dashboardState', 'main');
+                
+                // Set up the real-time listener
+                onSnapshot(dashboardDocRef, (doc) => {
+                    if (doc.exists()) {
+                        console.log("Received real-time update from Firestore.");
+                        renderDashboard(doc.data());
+                    } else {
+                        console.log("No data in Firestore, initializing with default state.");
+                        // If no doc, save the initial state to create it.
+                        saveState(); 
+                    }
+                }, (error) => {
+                    console.error("Error listening to dashboard state: ", error);
+                });
+
+            } catch (error) {
+                console.error("Firebase initialization or auth failed:", error);
+            }
+
+            setupEventListeners();
+        }
+
+        // --- EVENT LISTENERS SETUP ---
+        function setupEventListeners() {
             document.getElementById('add-city-btn').addEventListener('click', () => {
                 const cityNameInput = document.getElementById('new-city-name');
                 const cityName = cityNameInput.value.trim();
                 if (cityName) {
+                    const tableBody = document.getElementById('service-pages-table-body');
+                    const newRow = document.createElement('tr');
+                    newRow.classList.add('hover:bg-gray-50');
                     const slug = cityName.toLowerCase().replace(/\s+/g, '-');
-                    dashboardState.servicePages.push({ city: cityName, slug });
-                    renderServicePages();
-                    saveData();
+                    const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
+                    newRow.innerHTML = `<td class="p-3 border-b">${cityName}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
+                    tableBody.appendChild(newRow);
                     cityNameInput.value = '';
+                    saveState();
                 }
             });
 
@@ -408,144 +419,86 @@
                 const blogPostInput = document.getElementById('new-blog-post');
                 const postTitle = blogPostInput.value.trim();
                 if (postTitle) {
-                    const newId = 'blog' + Date.now();
-                    dashboardState.blogPosts.push({ id: newId, title: postTitle, checked: false });
-                    renderBlogPosts();
-                    saveData();
+                    // Just add to UI, let render function handle it from snapshot
+                    const blogList = document.getElementById('blog-post-list');
+                    const newItem = document.createElement('div');
+                    newItem.classList.add('task-item', 'flex', 'items-center');
+                    newItem.innerHTML = `<input type="checkbox" class="h-4 w-4 rounded task-checkbox"><label class="ml-3 text-gray-700"><a href="#" class="hover:underline text-blue-600">${postTitle}</a></label>`;
+                    blogList.appendChild(newItem);
                     blogPostInput.value = '';
+                    saveState();
                 }
             });
 
-            document.getElementById('blog-post-list').addEventListener('change', e => {
-                if(e.target.matches('.task-checkbox')) {
-                    const post = dashboardState.blogPosts.find(p => p.id === e.target.id);
-                    if (post) {
-                        post.checked = e.target.checked;
-                        saveData();
-                    }
-                }
-            });
-
-            // Pillar 5
-            document.getElementById('ad-group-table-body').addEventListener('change', e => {
-                if(e.target.matches('.status-select')) {
-                    const groupName = e.target.dataset.groupName;
-                    const newStatus = e.target.value;
-                    dashboardState.adGroupStatuses[groupName] = newStatus;
-                    e.target.className = `status-select ${newStatus === 'active' ? 'status-active' : 'status-paused'}`;
-                    saveData();
-                }
+            document.querySelectorAll('.task-checkbox, .status-select').forEach(element => {
+                element.addEventListener('change', saveState);
             });
             
-            // Generic Checkboxes
-            document.addEventListener('change', e => {
-                if (e.target.matches('.task-checkbox') && !e.target.closest('#blog-post-list')) {
-                    dashboardState.taskCheckboxes[e.target.id] = e.target.checked;
-                    saveData();
-                }
+             document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    updateSelectAppearance(this);
+                });
             });
-
-            // Pillar 6 - AI Chat
-            const chatInput = document.getElementById('chat-input');
-            const sendBtn = document.getElementById('send-btn');
-            const apiKey = 'AIzaSyCRYKBzfVAT4J0WbiDM4EEtf-Ngtzw9obo';
-
-            const handleSend = async () => {
-                const userPrompt = chatInput.value.trim();
-                if (!userPrompt) return;
-
-                dashboardState.chatHistory.push({ from: 'user', text: userPrompt });
-                renderChatHistory();
-                chatInput.value = '';
-
-                // Display loading indicator
-                const chatHistoryEl = document.getElementById('chat-history');
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'ai-msg p-3 rounded-lg mb-2 flex items-center space-x-2';
-                loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant</p><div class="loading-dots flex space-x-1"><div class="w-2 h-2 bg-gray-500 rounded-full"></div><div class="w-2 h-2 bg-gray-500 rounded-full"></div><div class="w-2 h-2 bg-gray-500 rounded-full"></div></div>`;
-                chatHistoryEl.appendChild(loadingDiv);
-                chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
-                
-                try {
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                    const systemPrompt = "You are a world-class marketing assistant for Mechanical Temp, a small HVAC company based in Metro Detroit. Your goal is to provide creative and practical marketing ideas. Be concise, friendly, and focus on strategies that deliver real value. Generate blog post titles, ad copy, social media posts, and other marketing content on request. Format your responses with simple HTML like <p>, <ul>, <li>, and <strong> for readability.";
-
-                    const payload = {
-                        contents: [{ parts: [{ text: userPrompt }] }],
-                        systemInstruction: { parts: [{ text: systemPrompt }] },
-                    };
-
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
-                    const result = await response.json();
-                    const aiText = result.candidates[0].content.parts[0].text;
-                    
-                    chatHistoryEl.removeChild(loadingDiv);
-                    dashboardState.chatHistory.push({ from: 'ai', text: aiText });
-                    renderChatHistory();
-                    saveData();
-
-                } catch (error) {
-                    console.error('Error fetching AI response:', error);
-                    chatHistoryEl.removeChild(loadingDiv);
-                    dashboardState.chatHistory.push({ from: 'ai', text: `<p class="text-red-700">Sorry, I couldn't get a response. Please check the API key and console for details.</p>` });
-                    renderChatHistory();
-                }
-            };
-            sendBtn.addEventListener('click', handleSend);
-            chatInput.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter') handleSend();
-            });
-        };
+        }
         
-        // --- 5. APP START ---
-        (async () => {
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
+        // --- AI CHAT ---
+        const chatHistory = document.getElementById('chat-history');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        
+        const handleSend = async () => {
+            const userPrompt = chatInput.value.trim();
+            if (!userPrompt) return;
 
-                onAuthStateChanged(auth, async (user) => {
-                    const statusIndicator = document.getElementById('db-status');
-                    if (user) {
-                        userId = user.uid;
-                        docRef = doc(db, "marketing_dashboards", `${appId}-${userId}`);
-                        statusIndicator.textContent = 'Syncing...';
-                        statusIndicator.classList.remove('bg-red-500');
-                        statusIndicator.classList.add('bg-blue-500');
-                        await loadData();
-                        statusIndicator.textContent = 'Synced';
-                        statusIndicator.classList.remove('bg-blue-500');
-                        statusIndicator.classList.add('bg-green-500');
-                    } else {
-                        statusIndicator.textContent = 'Authenticating...';
-                    }
+            const apiKey = ""; // API key is handled by the environment, leave empty.
+
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'user-msg p-3 rounded-lg mb-2';
+            userMsgDiv.innerHTML = `<p class="font-semibold text-sky-800">You</p><p class="text-gray-700">${userPrompt}</p>`;
+            chatHistory.appendChild(userMsgDiv);
+            chatInput.value = '';
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'ai-msg p-3 rounded-lg mb-2 flex items-center space-x-2';
+            loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant</p><div class="loading-dots flex space-x-1"><div class="w-2 h-2 bg-gray-500 rounded-full"></div><div class="w-2 h-2 bg-gray-500 rounded-full"></div><div class="w-2 h-2 bg-gray-500 rounded-full"></div></div>`;
+            chatHistory.appendChild(loadingDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            
+            try {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const systemPrompt = "You are a world-class marketing assistant for Mechanical Temp, a small HVAC company based in Metro Detroit. Your goal is to provide creative and practical marketing ideas. Be concise, friendly, and focus on strategies that deliver real value. Generate blog post titles, ad copy, social media posts, and other marketing content on request. Format your responses with simple HTML like <p>, <ul>, <li>, and <strong> for readability.";
+                const payload = {
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
 
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                
-                setupEventListeners();
+                if (!response.ok) throw new Error(`API error: ${response.statusText}`);
 
+                const result = await response.json();
+                const aiText = result.candidates[0].content.parts[0].text;
+                loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant</p><div class="text-gray-700">${aiText}</div>`;
             } catch (error) {
-                 console.error("Firebase initialization failed:", error);
-                 const statusIndicator = document.getElementById('db-status');
-                 statusIndicator.textContent = 'DB Init Failed';
-                 statusIndicator.classList.add('bg-red-500');
-                 // Render with default state if DB fails
-                 dashboardState = { ...defaultState };
-                 renderDashboard();
-                 setupEventListeners();
+                console.error('Error fetching AI response:', error);
+                loadingDiv.innerHTML = `<p class="font-semibold text-red-800">Error</p><p class="text-red-700">Sorry, I couldn't get a response. Please check the console for details.</p>`;
             }
-        })();
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        };
+
+        sendBtn.addEventListener('click', handleSend);
+        chatInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') handleSend();
+        });
+
+        // --- START THE APP ---
+        initialize();
+
     </script>
 </body>
 </html>
