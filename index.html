@@ -108,7 +108,7 @@
                             <button id="add-city-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Add City</button>
                         </div>
 
-                        <h3 class="text-xl font-semibold mt-6 mb-2"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages/64bafe92999de952790fe6fb" target="_blank" class="text-blue-600 hover:underline">B. Content Strategy: Blog / Resource Center</a></h3>
+                        <h3 class="text-xl font-semibold mt-6 mb-2"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages" target="_blank" class="text-blue-600 hover:underline">B. Content Strategy: Blog / Resource Center</a></h3>
                         <div class="space-y-2" id="blog-post-list">
                            <!-- Blog posts will be dynamically added by JavaScript -->
                         </div>
@@ -229,24 +229,15 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         // --- 1. CONFIG & INITIALIZATION ---
+        // These variables are placeholders and will be provided by the environment.
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-dashboard';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        const userProvidedConfig = {
-            apiKey: "AIzaSyDl0Vzu_td9llVcIhDwNZxnlsJ16cSSiV0",
-            authDomain: "marketing-dashboard-e3887.firebaseapp.com",
-            projectId: "marketing-dashboard-e3887",
-            storageBucket: "marketing-dashboard-e3887.firebasestorage.app",
-            messagingSenderId: "591399986351",
-            appId: "1:591399986351:web:cc413c2191671597fbe05a"
-        };
-        
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userProvidedConfig;
-
-
         let db, auth, userId, docRef;
-        let dashboardState = {}; 
+        let dashboardState = {}; // Local state object
         
+        // --- Default State for a new dashboard ---
         const defaultState = {
             servicePages: [
                 { city: 'Dearborn', slug: 'dearborn' }, { city: 'Southfield', slug: 'southfield' },
@@ -266,6 +257,8 @@
         };
 
         // --- 2. CORE FUNCTIONS (SAVE, LOAD, RENDER) ---
+
+        // Debounce function to prevent too many writes to Firestore
         const debounce = (func, delay) => {
             let timeout;
             return function(...args) {
@@ -293,7 +286,7 @@
                 statusIndicator.classList.remove('bg-yellow-500');
                 statusIndicator.classList.add('bg-red-500');
             }
-        }, 1500);
+        }, 1500); // Save data 1.5 seconds after the last change
 
         const loadData = async () => {
             if (!docRef) return;
@@ -302,26 +295,19 @@
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     console.log("Document data:", docSnap.data());
-                    dashboardState = { ...defaultState, ...docSnap.data(), chatHistory: docSnap.data().chatHistory || defaultState.chatHistory };
+                    dashboardState = { ...defaultState, ...docSnap.data() };
                 } else {
                     console.log("No such document! Creating with default state.");
                     dashboardState = { ...defaultState };
-                    await setDoc(docRef, dashboardState);
+                    await setDoc(docRef, dashboardState); // First time save
                 }
                 renderDashboard();
             } catch (error) {
                 console.error("Error loading data: ", error);
-                // **FIX:** Fallback to default state if loading fails, so the app doesn't crash.
-                dashboardState = JSON.parse(JSON.stringify(defaultState));
-                renderDashboard();
-                 const statusIndicator = document.getElementById('db-status');
-                 statusIndicator.textContent = 'Load Error';
-                 statusIndicator.classList.add('bg-red-500');
             }
         };
 
         const renderDashboard = () => {
-            if (!dashboardState) dashboardState = JSON.parse(JSON.stringify(defaultState));
             console.log("Rendering dashboard with state:", dashboardState);
             renderServicePages();
             renderBlogPosts();
@@ -329,11 +315,12 @@
             renderCheckboxes();
             renderChatHistory();
         };
+
+        // --- 3. UI RENDER FUNCTIONS ---
         
         const renderServicePages = () => {
             const tableBody = document.getElementById('service-pages-table-body');
             tableBody.innerHTML = '';
-            if (!dashboardState.servicePages) return;
             dashboardState.servicePages.forEach(page => {
                  const newRow = document.createElement('tr');
                  newRow.classList.add('hover:bg-gray-50');
@@ -346,7 +333,6 @@
         const renderBlogPosts = () => {
              const blogList = document.getElementById('blog-post-list');
              blogList.innerHTML = '';
-             if (!dashboardState.blogPosts) return;
              dashboardState.blogPosts.forEach(post => {
                 const newItem = document.createElement('div');
                 newItem.classList.add('task-item', 'flex', 'items-center');
@@ -363,7 +349,6 @@
             ];
             const tableBody = document.getElementById('ad-group-table-body');
             tableBody.innerHTML = '';
-            if (!dashboardState.adGroupStatuses) return;
             adGroupData.forEach(group => {
                 const status = dashboardState.adGroupStatuses[group.name] || 'paused';
                 const newRow = document.createElement('tr');
@@ -383,7 +368,6 @@
         
         const renderCheckboxes = () => {
             const checkboxes = document.querySelectorAll('.task-checkbox');
-            if (!dashboardState.taskCheckboxes) return;
             checkboxes.forEach(cb => {
                 if (dashboardState.taskCheckboxes[cb.id]) {
                     cb.checked = true;
@@ -394,7 +378,6 @@
         const renderChatHistory = () => {
             const chatHistoryEl = document.getElementById('chat-history');
             chatHistoryEl.innerHTML = '';
-            if (!dashboardState.chatHistory) return;
             dashboardState.chatHistory.forEach(msg => {
                 const msgDiv = document.createElement('div');
                 msgDiv.className = `${msg.from === 'user' ? 'user-msg' : 'ai-msg'} p-3 rounded-lg mb-2`;
@@ -406,12 +389,13 @@
             chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
         };
 
+        // --- 4. EVENT LISTENERS ---
         const setupEventListeners = () => {
+            // Pillar 1
             document.getElementById('add-city-btn').addEventListener('click', () => {
                 const cityNameInput = document.getElementById('new-city-name');
                 const cityName = cityNameInput.value.trim();
                 if (cityName) {
-                    if (!dashboardState.servicePages) dashboardState.servicePages = [];
                     const slug = cityName.toLowerCase().replace(/\s+/g, '-');
                     dashboardState.servicePages.push({ city: cityName, slug });
                     renderServicePages();
@@ -424,7 +408,6 @@
                 const blogPostInput = document.getElementById('new-blog-post');
                 const postTitle = blogPostInput.value.trim();
                 if (postTitle) {
-                    if (!dashboardState.blogPosts) dashboardState.blogPosts = [];
                     const newId = 'blog' + Date.now();
                     dashboardState.blogPosts.push({ id: newId, title: postTitle, checked: false });
                     renderBlogPosts();
@@ -443,9 +426,9 @@
                 }
             });
 
+            // Pillar 5
             document.getElementById('ad-group-table-body').addEventListener('change', e => {
                 if(e.target.matches('.status-select')) {
-                    if (!dashboardState.adGroupStatuses) dashboardState.adGroupStatuses = {};
                     const groupName = e.target.dataset.groupName;
                     const newStatus = e.target.value;
                     dashboardState.adGroupStatuses[groupName] = newStatus;
@@ -454,14 +437,15 @@
                 }
             });
             
+            // Generic Checkboxes
             document.addEventListener('change', e => {
                 if (e.target.matches('.task-checkbox') && !e.target.closest('#blog-post-list')) {
-                    if (!dashboardState.taskCheckboxes) dashboardState.taskCheckboxes = {};
                     dashboardState.taskCheckboxes[e.target.id] = e.target.checked;
                     saveData();
                 }
             });
 
+            // Pillar 6 - AI Chat
             const chatInput = document.getElementById('chat-input');
             const sendBtn = document.getElementById('send-btn');
             const apiKey = 'AIzaSyCRYKBzfVAT4J0WbiDM4EEtf-Ngtzw9obo';
@@ -469,12 +453,12 @@
             const handleSend = async () => {
                 const userPrompt = chatInput.value.trim();
                 if (!userPrompt) return;
-                
-                if (!dashboardState.chatHistory) dashboardState.chatHistory = [];
+
                 dashboardState.chatHistory.push({ from: 'user', text: userPrompt });
                 renderChatHistory();
                 chatInput.value = '';
 
+                // Display loading indicator
                 const chatHistoryEl = document.getElementById('chat-history');
                 const loadingDiv = document.createElement('div');
                 loadingDiv.className = 'ai-msg p-3 rounded-lg mb-2 flex items-center space-x-2';
@@ -556,7 +540,8 @@
                  const statusIndicator = document.getElementById('db-status');
                  statusIndicator.textContent = 'DB Init Failed';
                  statusIndicator.classList.add('bg-red-500');
-                 dashboardState = JSON.parse(JSON.stringify(defaultState));
+                 // Render with default state if DB fails
+                 dashboardState = { ...defaultState };
                  renderDashboard();
                  setupEventListeners();
             }
@@ -564,4 +549,3 @@
     </script>
 </body>
 </html>
-
