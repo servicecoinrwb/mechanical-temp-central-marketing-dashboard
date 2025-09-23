@@ -229,10 +229,23 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         // --- 1. CONFIG & INITIALIZATION ---
-        // These variables are placeholders and will be provided by the environment.
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-dashboard';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // ** ACTION REQUIRED **
+        // This object has been updated with your Firebase project's configuration.
+        const userProvidedConfig = {
+            apiKey: "AIzaSyDl0Vzu_td9llVcIhDwNZxnlsJ16cSSiV0",
+            authDomain: "marketing-dashboard-e3887.firebaseapp.com",
+            projectId: "marketing-dashboard-e3887",
+            storageBucket: "marketing-dashboard-e3887.firebasestorage.app",
+            messagingSenderId: "591399986351",
+            appId: "1:591399986351:web:cc413c2191671597fbe05a"
+        };
+        
+        // This logic allows the app to use environment variables if they exist, otherwise it falls back to your provided config.
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userProvidedConfig;
+
 
         let db, auth, userId, docRef;
         let dashboardState = {}; // Local state object
