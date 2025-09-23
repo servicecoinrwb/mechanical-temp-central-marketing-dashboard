@@ -50,6 +50,14 @@
         th {
             background-color: #f9fafb;
         }
+        /* AI Chat Styles */
+        .chat-history { height: 300px; overflow-y: auto; }
+        .user-msg { background-color: #e0f2fe; text-align: right; }
+        .ai-msg { background-color: #f3f4f6; }
+        .loading-dots div { animation: blink 1.4s infinite both; }
+        .loading-dots div:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots div:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -61,7 +69,8 @@
                 <h1 class="text-3xl font-bold">Mechanical Temp</h1>
                 <p class="text-lg text-gray-300">Central Marketing Dashboard</p>
             </div>
-            <div class="flex space-x-4 mt-4 md:mt-0">
+            <div class="flex flex-wrap justify-center gap-2 mt-4 md:mt-0">
+                <a href="https://piccolo-spinach-k6p6.squarespace.com/config/" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Website Admin</a>
                 <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amechanicaltemp.com" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Google Search Console</a>
                 <a href="https://www.google.com/search?q=mechanical+temp&rlz=1C1SQJL_enUS786US786&oq=mechanical+temp&gs_lcrp=EgZjaHJvbWUqDAgAECMYJxiABBiKBTIMCAAQIxgnGIAEGIoFMhAIARAuGK8BGMcBGIAEGI4FMgcIAhAAGIAEMgcIAxAAGIAEMgYIBBBFGEEyBggFEEUYPTIGCAYQRRhBMgYIBxBFGEHSAQgzODg1ajBqN6gCCLACAfEFHzkU-rb4cPnxBR85FPq2-HD5&sourceid=chrome&ie=UTF-8" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Google Business Profile</a>
                  <a href="https://ads.google.com/aw/campaigns" target="_blank" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition">Google Ads</a>
@@ -169,6 +178,23 @@
 
             <!-- RIGHT COLUMN: LOCAL SEO & GOALS -->
             <div class="space-y-8">
+                <!-- AI MARKETING ASSISTANT -->
+                <div class="dashboard-card">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold mb-4">Pillar 6: AI Marketing Assistant</h2>
+                        <div class="chat-history p-4 bg-gray-100 rounded-lg border" id="chat-history">
+                           <div class="ai-msg p-3 rounded-lg mb-2">
+                                <p class="font-semibold text-gray-800">Hello!</p>
+                                <p class="text-gray-700">How can I help you with your marketing today? Ask me to write ad copy, suggest blog topics, or draft a social media post.</p>
+                           </div>
+                        </div>
+                        <div class="mt-4 flex space-x-2">
+                            <input type="text" id="chat-input" placeholder="Ask for a blog post idea..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <button id="send-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Send</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- OFF-PAGE SEO -->
                 <div class="dashboard-card">
                      <div class="p-6">
@@ -228,7 +254,37 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Handle status dropdowns
+            // --- PILLAR 1: ON-PAGE SEO ---
+            document.getElementById('add-city-btn').addEventListener('click', () => {
+                const cityNameInput = document.getElementById('new-city-name');
+                const cityName = cityNameInput.value.trim();
+                if (cityName) {
+                    const tableBody = document.getElementById('service-pages-table-body');
+                    const newRow = document.createElement('tr');
+                    newRow.classList.add('hover:bg-gray-50');
+                    const slug = cityName.toLowerCase().replace(/\s+/g, '-');
+                    const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
+                    newRow.innerHTML = `<td class="p-3 border-b">${cityName}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
+                    tableBody.appendChild(newRow);
+                    cityNameInput.value = '';
+                }
+            });
+
+            document.getElementById('add-blog-btn').addEventListener('click', () => {
+                const blogPostInput = document.getElementById('new-blog-post');
+                const postTitle = blogPostInput.value.trim();
+                if (postTitle) {
+                    const blogList = document.getElementById('blog-post-list');
+                    const newItem = document.createElement('div');
+                    newItem.classList.add('task-item', 'flex', 'items-center');
+                    const newId = 'task' + (Date.now());
+                    newItem.innerHTML = `<input id="${newId}" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages" target="_blank" class="hover:underline text-blue-600">${postTitle}</a></label>`;
+                    blogList.appendChild(newItem);
+                    blogPostInput.value = '';
+                }
+            });
+            
+            // --- PILLAR 5: GOOGLE ADS ---
             const statusSelects = document.querySelectorAll('.status-select');
             statusSelects.forEach(select => {
                 select.addEventListener('change', function() {
@@ -241,51 +297,74 @@
                 });
             });
 
-            // Handle adding new city
-            document.getElementById('add-city-btn').addEventListener('click', function() {
-                const cityNameInput = document.getElementById('new-city-name');
-                const cityName = cityNameInput.value.trim();
+            // --- PILLAR 6: AI MARKETING ASSISTANT ---
+            const chatHistory = document.getElementById('chat-history');
+            const chatInput = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+            const apiKey = 'AIzaSyCRYKBzfVAT4J0WbiDM4EEtf-Ngtzw9obo'; 
 
-                if (cityName) {
-                    const tableBody = document.getElementById('service-pages-table-body');
-                    const newRow = document.createElement('tr');
-                    newRow.classList.add('hover:bg-gray-50');
+            const handleSend = async () => {
+                const userPrompt = chatInput.value.trim();
+                if (!userPrompt) return;
 
-                    const slug = cityName.toLowerCase().replace(/\s+/g, '-');
-                    const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
+                // Display user message
+                const userMsgDiv = document.createElement('div');
+                userMsgDiv.className = 'user-msg p-3 rounded-lg mb-2';
+                userMsgDiv.innerHTML = `<p class="font-semibold text-sky-800">You</p><p class="text-gray-700">${userPrompt}</p>`;
+                chatHistory.appendChild(userMsgDiv);
+                chatInput.value = '';
+                chatHistory.scrollTop = chatHistory.scrollHeight;
 
-                    newRow.innerHTML = `
-                        <td class="p-3 border-b">${cityName}</td>
-                        <td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td>
-                        <td class="p-3 border-b"><span class="status-live">✅ Live</span></td>
-                    `;
+                // Display loading indicator
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'ai-msg p-3 rounded-lg mb-2 flex items-center space-x-2';
+                loadingDiv.innerHTML = `
+                    <p class="font-semibold text-gray-800">AI Assistant</p>
+                    <div class="loading-dots flex space-x-1">
+                        <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                        <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                        <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                    </div>`;
+                chatHistory.appendChild(loadingDiv);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+                
+                // Call Gemini API
+                try {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    const systemPrompt = "You are a world-class marketing assistant for Mechanical Temp, a small HVAC company based in Metro Detroit. Your goal is to provide creative and practical marketing ideas. Be concise, friendly, and focus on strategies that deliver real value. Generate blog post titles, ad copy, social media posts, and other marketing content on request. Format your responses with simple HTML like <p>, <ul>, <li>, and <strong> for readability.";
 
-                    tableBody.appendChild(newRow);
-                    cityNameInput.value = '';
+                    const payload = {
+                        contents: [{ parts: [{ text: userPrompt }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    const aiText = result.candidates[0].content.parts[0].text;
+
+                    // Display AI response
+                    loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant</p><div class="text-gray-700">${aiText}</div>`;
+                
+                } catch (error) {
+                    console.error('Error fetching AI response:', error);
+                    loadingDiv.innerHTML = `<p class="font-semibold text-red-800">Error</p><p class="text-red-700">Sorry, I couldn't get a response. Please check the API key and console for details.</p>`;
                 }
-            });
+                 chatHistory.scrollTop = chatHistory.scrollHeight;
+            };
 
-            // Handle adding new blog post
-            document.getElementById('add-blog-btn').addEventListener('click', function() {
-                const blogPostInput = document.getElementById('new-blog-post');
-                const postTitle = blogPostInput.value.trim();
-
-                if (postTitle) {
-                    const blogList = document.getElementById('blog-post-list');
-                    const newItem = document.createElement('div');
-                    newItem.classList.add('task-item', 'flex', 'items-center');
-                    
-                    const newId = 'task' + (document.querySelectorAll('.task-item').length + 1);
-
-                    newItem.innerHTML = `
-                        <input id="${newId}" type="checkbox" class="h-4 w-4 rounded">
-                        <label class="ml-3 text-gray-700">
-                            <a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages" target="_blank" class="hover:underline text-blue-600">${postTitle}</a>
-                        </label>
-                    `;
-
-                    blogList.appendChild(newItem);
-                    blogPostInput.value = '';
+            sendBtn.addEventListener('click', handleSend);
+            chatInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    handleSend();
                 }
             });
         });
