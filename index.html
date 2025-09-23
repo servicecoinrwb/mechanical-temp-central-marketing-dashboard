@@ -31,7 +31,7 @@
             font-size: 0.8rem;
             font-weight: 600;
         }
-        .task-item:has(input:checked) label {
+        .task-item:has(input:checked) label, .task-item:has(input:checked) a {
             text-decoration: line-through;
             color: #6b7280;
         }
@@ -115,9 +115,9 @@
 
                         <h3 class="text-xl font-semibold mt-6 mb-2">B. Local Citations</h3>
                         <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task11" type="checkbox" class="h-4 w-4 rounded"><label for="task11" class="ml-3 text-gray-700">Check Yelp Profile</label></div>
-                            <div class="task-item flex items-center"><input id="task12" type="checkbox" class="h-4 w-4 rounded"><label for="task12" class="ml-3 text-gray-700">Check HomeAdvisor/Angi Profile</label></div>
-                            <div class="task-item flex items-center"><input id="task13" type="checkbox" class="h-4 w-4 rounded"><label for="task13" class="ml-3 text-gray-700">Check BBB Profile</label></div>
+                            <div class="task-item flex items-center"><input id="task11" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://biz.yelp.com/" target="_blank" class="hover:underline text-blue-600">Check Yelp Profile</a></label></div>
+                            <div class="task-item flex items-center"><input id="task12" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://office.angi.com/" target="_blank" class="hover:underline text-blue-600">Check HomeAdvisor/Angi Profile</a></label></div>
+                            <div class="task-item flex items-center"><input id="task13" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://www.bbb.org/" target="_blank" class="hover:underline text-blue-600">Check BBB Profile</a></label></div>
                         </div>
                     </div>
                 </div>
@@ -130,7 +130,7 @@
                      <div class="p-6">
                         <h2 class="text-2xl font-bold mb-4">Pillar 3: Technical SEO</h2>
                         <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task14" type="checkbox" class="h-4 w-4 rounded"><label for="task14" class="ml-3 text-gray-700">Run quarterly PageSpeed Insights report</label></div>
+                            <div class="task-item flex items-center"><input id="task14" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://pagespeed.web.dev/" target="_blank" class="hover:underline text-blue-600">Run quarterly PageSpeed Insights report</a></label></div>
                             <div class="task-item flex items-center"><input id="task15" type="checkbox" class="h-4 w-4 rounded"><label for="task15" class="ml-3 text-gray-700">Check for crawl errors monthly (GSC)</label></div>
                             <div class="task-item flex items-center"><input id="task16" type="checkbox" class="h-4 w-4 rounded"><label for="task16" class="ml-3 text-gray-700">Ensure sitemap is up-to-date (GSC)</label></div>
                         </div>
@@ -142,7 +142,7 @@
                         <h2 class="text-2xl font-bold mb-4">Pillar 4: Social & Email</h2>
                         <h3 class="text-xl font-semibold mb-2">A. Social Media (Weekly)</h3>
                         <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task17" type="checkbox" class="h-4 w-4 rounded"><label for="task17" class="ml-3 text-gray-700">Post on Facebook (2x)</label></div>
+                            <div class="task-item flex items-center"><input id="task17" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://www.facebook.com/" target="_blank" class="hover:underline text-blue-600">Post on Facebook (2x)</a></label></div>
                             <div class="task-item flex items-center"><input id="task18" type="checkbox" class="h-4 w-4 rounded"><label for="task18" class="ml-3 text-gray-700">Respond to all comments & DMs</label></div>
                         </div>
                         <h3 class="text-xl font-semibold mt-6 mb-2">B. Email Marketing (Monthly)</h3>
