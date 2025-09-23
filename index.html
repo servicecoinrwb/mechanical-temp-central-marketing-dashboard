@@ -23,7 +23,7 @@
             background-color: #1A2D4E;
             color: white;
         }
-        .status-live, .status-active, .status-paused {
+        .status-live, .status-select {
             padding: 2px 10px;
             border-radius: 9999px;
             font-size: 0.8rem;
@@ -31,8 +31,18 @@
             text-align: center;
         }
         .status-live { background-color: #dcfce7; color: #166534; }
-        .status-active { background-color: #dcfce7; color: #166534; }
-        .status-paused { background-color: #fee2e2; color: #991b1b; }
+        
+        .status-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+        }
+        .status-select.status-active { background-color: #dcfce7; color: #166534; }
+        .status-select.status-paused { background-color: #fee2e2; color: #991b1b; }
+
         .task-item:has(input:checked) label, .task-item:has(input:checked) a {
             text-decoration: line-through;
             color: #6b7280;
@@ -71,7 +81,7 @@
                                 <thead>
                                     <tr><th class="p-3 border-b">City</th><th class="p-3 border-b">URL</th><th class="p-3 border-b">Status</th></tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="service-pages-table-body">
                                     <tr class="hover:bg-gray-50"><td class="p-3 border-b">Dearborn</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/dearborn" target="_blank" class="text-blue-600 hover:underline">/dearborn</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
                                     <tr class="hover:bg-gray-50"><td class="p-3 border-b">Southfield</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/southfield" target="_blank" class="text-blue-600 hover:underline">/southfield</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
                                     <tr class="hover:bg-gray-50"><td class="p-3 border-b">Novi</td><td class="p-3 border-b"><a href="https://www.mechanicaltemp.com/service-areas/novi" target="_blank" class="text-blue-600 hover:underline">/novi</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td></tr>
@@ -81,10 +91,19 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="mt-4 flex space-x-2">
+                            <input type="text" id="new-city-name" placeholder="Enter new city name..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <button id="add-city-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Add City</button>
+                        </div>
+
                         <h3 class="text-xl font-semibold mt-6 mb-2">B. Content Strategy: Blog / Resource Center</h3>
-                        <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task1" type="checkbox" class="h-4 w-4 rounded"><label for="task1" class="ml-3 text-gray-700">How to Prepare Your Furnace for a Michigan Winter</label></div>
-                            <div class="task-item flex items-center"><input id="task2" type="checkbox" class="h-4 w-4 rounded"><label for="task2" class="ml-3 text-gray-700">Is My AC Ready for Michigan's Humid Summers?</label></div>
+                        <div class="space-y-2" id="blog-post-list">
+                            <div class="task-item flex items-center"><input id="task1" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages" target="_blank" class="hover:underline text-blue-600">How to Prepare Your Furnace for a Michigan Winter</a></label></div>
+                            <div class="task-item flex items-center"><input id="task2" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages" target="_blank" class="hover:underline text-blue-600">Is My AC Ready for Michigan's Humid Summers?</a></label></div>
+                        </div>
+                         <div class="mt-4 flex space-x-2">
+                            <input type="text" id="new-blog-post" placeholder="Enter new blog post title..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <button id="add-blog-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Add Post</button>
                         </div>
                     </div>
                 </div>
@@ -111,12 +130,36 @@
                                     <tr><th class="p-3 border-b">Ad Group</th><th class="p-3 border-b">Recommended Season</th><th class="p-3 border-b">Status</th></tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Furnace Maintenance</td><td class="p-3 border-b">Fall / Winter</td><td class="p-3 border-b"><span class="status-active">✅ Active</span></td></tr>
-                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Emergency Furnace Repair</td><td class="p-3 border-b">Fall / Winter</td><td class="p-3 border-b"><span class="status-active">✅ Active</span></td></tr>
-                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">Emergency AC Repair</td><td class="p-3 border-b">Spring / Summer</td><td class="p-3 border-b"><span class="status-active">✅ Active</span></td></tr>
-                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">AC Tune-Up</td><td class="p-3 border-b">Spring</td><td class="p-3 border-b"><span class="status-paused">❌ Paused</span></td></tr>
-                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">New AC Installation</td><td class="p-3 border-b">Spring / Summer</td><td class="p-3 border-b"><span class="status-paused">❌ Paused</span></td></tr>
-                                    <tr class="hover:bg-gray-50"><td class="p-3 border-b">New Furnace Installation</td><td class="p-3 border-b">Fall / Winter</td><td class="p-3 border-b"><span class="status-paused">❌ Paused</span></td></tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">Furnace Maintenance</td>
+                                        <td class="p-3 border-b">Fall / Winter</td>
+                                        <td class="p-3 border-b"><select class="status-select status-active"><option value="active" selected>✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">Emergency Furnace Repair</td>
+                                        <td class="p-3 border-b">Fall / Winter</td>
+                                        <td class="p-3 border-b"><select class="status-select status-active"><option value="active" selected>✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">Emergency AC Repair</td>
+                                        <td class="p-3 border-b">Spring / Summer</td>
+                                        <td class="p-3 border-b"><select class="status-select status-paused"><option value="active">✅ Active</option><option value="paused" selected>❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">AC Tune-Up</td>
+                                        <td class="p-3 border-b">Spring</td>
+                                        <td class="p-3 border-b"><select class="status-select status-paused"><option value="active">✅ Active</option><option value="paused" selected>❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">New AC Installation</td>
+                                        <td class="p-3 border-b">Spring / Summer</td>
+                                        <td class="p-3 border-b"><select class="status-select status-paused"><option value="active">✅ Active</option><option value="paused" selected>❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">New Furnace Installation</td>
+                                        <td class="p-3 border-b">Fall / Winter</td>
+                                        <td class="p-3 border-b"><select class="status-select status-paused"><option value="active">✅ Active</option><option value="paused" selected>❌ Paused</option></select></td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -142,9 +185,14 @@
                 <div class="dashboard-card">
                      <div class="p-6">
                         <h2 class="text-2xl font-bold mb-4">Pillar 3: Technical SEO</h2>
+                        <h3 class="text-xl font-semibold mb-2">A. Monthly Health Check</h3>
                         <div class="space-y-2">
                             <div class="task-item flex items-center"><input id="task14" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://pagespeed.web.dev/" target="_blank" class="hover:underline text-blue-600">Run PageSpeed Insights report</a></label></div>
                             <div class="task-item flex items-center"><input id="task15" type="checkbox" class="h-4 w-4 rounded"><label for="task15" class="ml-3 text-gray-700">Check for crawl errors (in GSC)</label></div>
+                        </div>
+                        <h3 class="text-xl font-semibold mt-6 mb-2">B. How-To Guides & Summaries</h3>
+                        <div class="text-sm text-gray-600">
+                           <p><strong>How to Check for Crawl Errors:</strong><br> 1. Go to Google Search Console (GSC). <br>2. In the left menu, click 'Indexing' > 'Pages'. <br>3. Scroll down to the "Why pages aren't indexed" section. <br>4. Look for "Not found (404)" errors. If important pages are listed, set up a redirect in Squarespace.</p>
                         </div>
                     </div>
                 </div>
@@ -154,7 +202,7 @@
                         <h2 class="text-2xl font-bold mb-4">Pillar 4: Social & Email</h2>
                         <h3 class="text-xl font-semibold mb-2">A. Social Media (Weekly)</h3>
                         <div class="space-y-2">
-                            <div class="task-item flex items-center"><input id="task17" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://www.facebook.com/" target="_blank" class="hover:underline text-blue-600">Post on Facebook (2x)</a></label></div>
+                            <div class="task-item flex items-center"><input id="task17" type="checkbox" class="h-4 w-4 rounded"><label class="ml-3 text-gray-700"><a href="https://www.facebook.com/mechanicaltemp" target="_blank" class="hover:underline text-blue-600">Post on Facebook (2x)</a></label></div>
                         </div>
                         <h3 class="text-xl font-semibold mt-6 mb-2">B. Email Marketing (Monthly)</h3>
                         <div class="space-y-2">
@@ -177,6 +225,71 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Handle status dropdowns
+            const statusSelects = document.querySelectorAll('.status-select');
+            statusSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    this.classList.remove('status-active', 'status-paused');
+                    if (this.value === 'active') {
+                        this.classList.add('status-active');
+                    } else {
+                        this.classList.add('status-paused');
+                    }
+                });
+            });
+
+            // Handle adding new city
+            document.getElementById('add-city-btn').addEventListener('click', function() {
+                const cityNameInput = document.getElementById('new-city-name');
+                const cityName = cityNameInput.value.trim();
+
+                if (cityName) {
+                    const tableBody = document.getElementById('service-pages-table-body');
+                    const newRow = document.createElement('tr');
+                    newRow.classList.add('hover:bg-gray-50');
+
+                    const slug = cityName.toLowerCase().replace(/\s+/g, '-');
+                    const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
+
+                    newRow.innerHTML = `
+                        <td class="p-3 border-b">${cityName}</td>
+                        <td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td>
+                        <td class="p-3 border-b"><span class="status-live">✅ Live</span></td>
+                    `;
+
+                    tableBody.appendChild(newRow);
+                    cityNameInput.value = '';
+                }
+            });
+
+            // Handle adding new blog post
+            document.getElementById('add-blog-btn').addEventListener('click', function() {
+                const blogPostInput = document.getElementById('new-blog-post');
+                const postTitle = blogPostInput.value.trim();
+
+                if (postTitle) {
+                    const blogList = document.getElementById('blog-post-list');
+                    const newItem = document.createElement('div');
+                    newItem.classList.add('task-item', 'flex', 'items-center');
+                    
+                    const newId = 'task' + (document.querySelectorAll('.task-item').length + 1);
+
+                    newItem.innerHTML = `
+                        <input id="${newId}" type="checkbox" class="h-4 w-4 rounded">
+                        <label class="ml-3 text-gray-700">
+                            <a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages" target="_blank" class="hover:underline text-blue-600">${postTitle}</a>
+                        </label>
+                    `;
+
+                    blogList.appendChild(newItem);
+                    blogPostInput.value = '';
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
