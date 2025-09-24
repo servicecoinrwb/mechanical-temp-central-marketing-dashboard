@@ -410,12 +410,25 @@
         const chatHistory = document.getElementById('chat-history');
         const chatInput = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
-        
+        // IMPORTANT: PASTE YOUR GOOGLE AI API KEY HERE to enable the AI assistant when running locally.
+        const GEMINI_API_KEY = "AIzaSyCRYKBzfVAT4J0WbiDM4EEtf-Ngtzw9obo"; // Get your key from https://aistudio.google.com/
+
         const handleSend = async () => {
             const userPrompt = chatInput.value.trim();
-            if (!userPrompt) return;
+            // In a real preview environment, a key might be injected globally. 
+            // We check our constant first.
+            const apiKey = GEMINI_API_KEY !== "YOUR_API_KEY_HERE" ? GEMINI_API_KEY : (typeof __GEMINI_API_KEY__ !== 'undefined' ? __GEMINI_API_KEY__ : "");
 
-            const apiKey = ""; // API key is handled by the environment, leave empty.
+            if (!userPrompt) return;
+            
+            if (!apiKey) {
+                 const aiErrorDiv = document.createElement('div');
+                 aiErrorDiv.className = 'ai-msg p-3 rounded-lg mb-2';
+                 aiErrorDiv.innerHTML = `<p class="font-semibold text-red-800">Configuration Error</p><p class="text-red-700">The AI Assistant is not configured. Please add a valid Gemini API key to the 'GEMINI_API_KEY' variable in the HTML file to use this feature.</p>`;
+                 chatHistory.appendChild(aiErrorDiv);
+                 chatHistory.scrollTop = chatHistory.scrollHeight;
+                 return;
+            }
 
             const userMsgDiv = document.createElement('div');
             userMsgDiv.className = 'user-msg p-3 rounded-lg mb-2';
@@ -444,14 +457,14 @@
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+                if (!response.ok) throw new Error(`API error: ${response.statusText} (${response.status})`);
 
                 const result = await response.json();
                 const aiText = result.candidates[0].content.parts[0].text;
                 loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant</p><div class="text-gray-700">${aiText}</div>`;
             } catch (error) {
                 console.error('Error fetching AI response:', error);
-                loadingDiv.innerHTML = `<p class="font-semibold text-red-800">Error</p><p class="text-red-700">Sorry, I couldn't get a response. Please check the console for details.</p>`;
+                loadingDiv.innerHTML = `<p class="font-semibold text-red-800">Error</p><p class="text-red-700">Sorry, I couldn't get a response. The API key may be invalid or the service may be unavailable. Please check the console for details.</p>`;
             }
             chatHistory.scrollTop = chatHistory.scrollHeight;
         };
