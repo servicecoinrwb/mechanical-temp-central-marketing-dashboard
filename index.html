@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
     <title>Mechanical Temp - Marketing Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,6 +74,7 @@
                 <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amechanicaltemp.com" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Search Console</a>
                 <a href="https://www.google.com/search?q=mechanical+temp" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Business Profile</a>
                 <a href="https://www.facebook.com/mechanicaltemp/?_rdr&checkpoint_src=any" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Facebook Page</a>
+                <a href="https://publish.buffer.com/all-channels" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Buffer</a>
                 <a href="https://ads.google.com/aw/campaigns" target="_blank" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition">Google Ads</a>
             </div>
         </header>
@@ -83,23 +84,8 @@
                 <div class="dashboard-card">
                     <div class="p-6">
                         <h2 class="text-2xl font-bold mb-4">Pillar 1: Content & SEO (Organic Lead Generation)</h2>
-                        <h3 class="text-xl font-semibold mb-2">A. Local Service Area Pages</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr><th class="p-3 border-b">City</th><th class="p-3 border-b">URL</th><th class="p-3 border-b">Status</th></tr>
-                                </thead>
-                                <tbody id="service-pages-table-body">
-                                    <!-- Cities will be loaded here by JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="mt-4 flex space-x-2">
-                            <input type="text" id="new-city-name" placeholder="Enter new city name..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <button id="add-city-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Add City</button>
-                        </div>
-
-                        <h3 class="text-xl font-semibold mt-6 mb-2">B. Content Strategy: Blog / Resource Center</h3>
+                        
+                        <h3 class="text-xl font-semibold mb-2">A. Content Strategy: Blog / Resource Center</h3>
                         <div class="space-y-2" id="blog-post-list">
                              <!-- Blog posts will be loaded here by JavaScript -->
                         </div>
@@ -107,9 +93,17 @@
                             <input type="text" id="new-blog-post" placeholder="Enter new blog post title..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                             <button id="add-blog-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Add Post</button>
                         </div>
-                        <h3 class="text-xl font-semibold mt-6 mb-2">C. Video Content</h3>
+
+                        <h3 class="text-xl font-semibold mt-6 mb-2">B. Video Content</h3>
                         <div class="space-y-2">
                             <div class="task-item flex items-center"><input id="task-video-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-video-1" class="ml-3 text-gray-700">Film short video (e.g., "How to Change Your Furnace Filter")</label></div>
+                        </div>
+
+                        <h3 class="text-xl font-semibold mt-6 mb-2">C. Foundational SEO Tasks</h3>
+                        <div class="space-y-2">
+                            <div class="task-item flex items-center"><input id="task-seo-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-seo-1" class="ml-3 text-gray-700">Perform keyword research for new content ideas</label></div>
+                            <div class="task-item flex items-center"><input id="task-seo-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-seo-2" class="ml-3 text-gray-700">Optimize title tags & meta descriptions on core service pages</label></div>
+                            <div class="task-item flex items-center"><input id="task-seo-3" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-seo-3" class="ml-3 text-gray-700">Add internal links from blog posts to relevant service pages</label></div>
                         </div>
                     </div>
                 </div>
@@ -197,6 +191,23 @@
 
                 <div class="dashboard-card">
                        <div class="p-6">
+                            <h2 class="text-2xl font-bold mb-4">Pillar 7: Social Media Presence</h2>
+                            <h3 class="text-xl font-semibold mb-2">A. Weekly Posting Schedule</h3>
+                            <div class="space-y-2">
+                                <div class="task-item flex items-center"><input id="task-social-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-social-1" class="ml-3 text-gray-700">Schedule 2-3 posts for the week in Buffer</label></div>
+                                <div class="task-item flex items-center"><input id="task-social-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-social-2" class="ml-3 text-gray-700">Share latest blog post to Facebook/Google</label></div>
+                                <div class="task-item flex items-center"><input id="task-social-3" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-social-3" class="ml-3 text-gray-700">Post a "behind-the-scenes" or team photo</label></div>
+                            </div>
+                             <h3 class="text-xl font-semibold mt-6 mb-2">B. Engagement & Growth</h3>
+                            <div class="space-y-2">
+                                <div class="task-item flex items-center"><input id="task-social-4" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-social-4" class="ml-3 text-gray-700">Check and respond to all comments & messages</label></div>
+                                <div class="task-item flex items-center"><input id="task-social-5" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-social-5" class="ml-3 text-gray-700">Create one short-form video (Reel/Short)</label></div>
+                            </div>
+                       </div>
+                </div>
+
+                <div class="dashboard-card">
+                       <div class="p-6">
                             <h2 class="text-2xl font-bold mb-4">Pillar 2: Off-Page SEO (Local)</h2>
                             <h3 class="text-xl font-semibold mb-2">A. Google Business Profile (Weekly)</h3>
                             <div class="space-y-2">
@@ -262,15 +273,7 @@
         // --- DATA PERSISTENCE USING LOCALSTORAGE ---
 
         const saveState = () => {
-            // 1. Save Service Pages
-            const servicePages = [];
-            document.querySelectorAll('#service-pages-table-body tr').forEach(row => {
-                const city = row.cells[0].textContent;
-                servicePages.push({ city });
-            });
-            localStorage.setItem('dashboard_servicePages', JSON.stringify(servicePages));
-
-            // 2. Save Blog Posts
+            // 1. Save Blog Posts
             const blogPosts = [];
             document.querySelectorAll('#blog-post-list .task-item').forEach(item => {
                 const title = item.querySelector('a').textContent;
@@ -279,14 +282,14 @@
             });
             localStorage.setItem('dashboard_blogPosts', JSON.stringify(blogPosts));
 
-            // 3. Save Checkboxes
+            // 2. Save Checkboxes
             const checkboxStates = {};
             document.querySelectorAll('.task-checkbox').forEach(box => {
                 checkboxStates[box.id] = box.checked;
             });
             localStorage.setItem('dashboard_checkboxStates', JSON.stringify(checkboxStates));
 
-            // 4. Save Ad Group Statuses
+            // 3. Save Ad Group Statuses
             const adGroupStatuses = {};
             document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
                 const adGroupName = select.closest('tr').cells[0].textContent;
@@ -297,43 +300,24 @@
         };
 
         const loadState = () => {
-            // 1. Load Service Pages
-            const savedPages = JSON.parse(localStorage.getItem('dashboard_servicePages')) || [
-                { city: 'Dearborn' }, { city: 'Southfield' }, { city: 'Novi' },
-            ];
-            renderServicePages(savedPages);
-
-            // 2. Load Blog Posts
+            // 1. Load Blog Posts
             const savedPosts = JSON.parse(localStorage.getItem('dashboard_blogPosts')) || [
                 { title: 'How to Prepare Your Furnace for a Michigan Winter', checked: false },
                 { title: "Is My AC Ready for Michigan's Humid Summers?", checked: false },
             ];
             renderBlogPosts(savedPosts);
 
-            // 3. Load Checkboxes
+            // 2. Load Checkboxes
             const savedCheckboxes = JSON.parse(localStorage.getItem('dashboard_checkboxStates')) || {};
             renderCheckboxes(savedCheckboxes);
 
-            // 4. Load Ad Group Statuses
+            // 3. Load Ad Group Statuses
             const savedAdGroups = JSON.parse(localStorage.getItem('dashboard_adGroupStatuses')) || {};
             renderAdGroups(savedAdGroups);
              console.log("State loaded from localStorage!");
         };
 
         // --- RENDERING FUNCTIONS ---
-        const renderServicePages = (pages) => {
-            const tableBody = document.getElementById('service-pages-table-body');
-            tableBody.innerHTML = '';
-            pages.forEach(page => {
-                const newRow = document.createElement('tr');
-                newRow.classList.add('hover:bg-gray-50');
-                const slug = page.city.toLowerCase().replace(/\s+/g, '-');
-                const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
-                newRow.innerHTML = `<td class="p-3 border-b">${page.city}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
-                tableBody.appendChild(newRow);
-            });
-        };
-
         const renderBlogPosts = (posts) => {
             const blogList = document.getElementById('blog-post-list');
             blogList.innerHTML = '';
@@ -372,18 +356,6 @@
         
         // --- EVENT LISTENERS SETUP ---
         function setupEventListeners() {
-            document.getElementById('add-city-btn').addEventListener('click', () => {
-                const cityNameInput = document.getElementById('new-city-name');
-                const cityName = cityNameInput.value.trim();
-                if (cityName) {
-                    const currentPages = JSON.parse(localStorage.getItem('dashboard_servicePages')) || [];
-                    currentPages.push({ city: cityName });
-                    renderServicePages(currentPages);
-                    cityNameInput.value = '';
-                    saveState();
-                }
-            });
-
             document.getElementById('add-blog-btn').addEventListener('click', () => {
                 const blogPostInput = document.getElementById('new-blog-post');
                 const postTitle = blogPostInput.value.trim();
@@ -482,3 +454,4 @@
     </script>
 </body>
 </html>
+
