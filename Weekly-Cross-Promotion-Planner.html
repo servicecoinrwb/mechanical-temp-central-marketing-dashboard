@@ -23,11 +23,22 @@
             border-radius: 4px;
             border: 1px solid transparent;
             transition: border-color 0.2s;
+            background-color: #fefefe; /* White background for editable cells */
         }
         .editable:focus {
             outline: none;
             border-color: #0ea5e9; /* Sky blue focus */
             background-color: #fff;
+        }
+        .review-metric {
+            background-color: #f0f9ff; /* Light blue background for metric areas */
+            border-left: 4px solid #38bdf8; /* Blue accent bar */
+        }
+        .cheat-sheet-card {
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
         }
     </style>
 </head>
@@ -38,76 +49,159 @@
         <p class="text-slate-300 mt-1">Manage your Google Business Profile (GBP) and Facebook content flow efficiently.</p>
     </header>
 
-    <div class="table-container mx-auto bg-white p-4 sm:p-6 rounded-b-xl shadow-lg">
-        <h2 class="text-xl font-bold mb-4 text-gray-700">Content Planning Matrix (Click to Edit)</h2>
+    <div class="table-container mx-auto">
+        
+        <!-- ============================================= -->
+        <!-- SEO & PERFORMANCE CHEAT SHEET -->
+        <!-- ============================================= -->
+        <div class="cheat-sheet-card mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">📋 Weekly Action Cheat Sheet</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Accessing Performance Data -->
+                <div>
+                    <h3 class="text-lg font-semibold text-sky-600 mb-2">1. How to Access Metrics (Every Monday)</h3>
+                    <ol class="list-decimal list-inside text-sm text-gray-700 space-y-2 ml-4">
+                        <li>Log into the **Google Account** associated with your business profile.</li>
+                        <li>Search for "**Mechanical Temp**" on Google Search.</li>
+                        <li>Your management dashboard will appear directly above the search results.</li>
+                        <li>Click the **Performance** tab (or **Insights** in the old interface).</li>
+                        <li>Set the time frame to the **Last 7 Days**.</li>
+                        <li>Look under the **Interactions** or **Customer Actions** section to fill out the table below.</li>
+                    </ol>
+                </div>
 
-        <!-- Key Instructions -->
-        <div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 rounded-lg">
-            <p class="font-semibold mb-1">🔑 **Link Rule Reminders:**</p>
-            <ul class="list-disc list-inside text-sm ml-4">
-                <li>**GBP Link:** MUST be a specific SEO City Page (`.../southfield.html`).</li>
-                <li>**Facebook Link:** MUST be the general homepage (`https://www.mechanicaltemp.com/`).</li>
-            </ul>
+                <!-- Monthly SEO Health Check -->
+                <div>
+                    <h3 class="text-lg font-semibold text-sky-600 mb-2">2. Monthly SEO Health Check (Verify These)</h3>
+                    <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-4">
+                        <li>**Hours:** Are special/holiday hours set correctly? (Crucial)</li>
+                        <li>**Service Area:** Is the trimmed list (8 cities) still accurate?</li>
+                        <li>**Q&A:** Have we asked/answered 5-10 keyword-rich questions?</li>
+                        <li>**Reviews:** Have ALL reviews (positive & negative) been replied to? (Aim for a 24-hr response time).</li>
+                        <li>**Products:** Are the "Service Plan" and "Estimate" tiles live and correct?</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ============================================= -->
+        <!-- CONTENT PLANNING MATRIX -->
+        <!-- ============================================= -->
+        <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg border-t-0">
+            <h2 class="text-xl font-bold mb-4 text-gray-700">Content Planning Matrix (Click to Edit)</h2>
+
+            <!-- Key Instructions -->
+            <div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 rounded-lg">
+                <p class="font-semibold mb-1">🔑 **Link Rule Reminders:**</p>
+                <ul class="list-disc list-inside text-sm ml-4">
+                    <li>**GBP Link:** MUST be a specific SEO City Page (e.g., `/southfield.html`, `/livonia.html`).</li>
+                    <li>**Facebook Link:** MUST be the general homepage (`https://www.mechanicaltemp.com/`) for broad appeal.</li>
+                </ul>
+            </div>
+
+            <table class="min-w-full divide-y divide-gray-300 border border-gray-300 rounded-lg overflow-hidden">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 w-1/12">Day</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-2/12">GBP Topic</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-3/12">GBP Link (SEO Destination)</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-4/12">Facebook Text (Hook/Engagement)</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-2/12">Facebook Link</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    
+                    <!-- Example Row 1: Offer (Southfield) -->
+                    <tr>
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Mon</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">$50 Off Any Repair (Southfield)</td>
+                        <td class="editable text-sm text-sky-600" contenteditable="true">https://www.mechanicaltemp.com/southfield.html</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">Who needs a reliable tech on speed dial? We're taking $50 OFF this week to prove we're the fastest in Southfield!</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">https://www.mechanicaltemp.com/</td>
+                    </tr>
+
+                    <!-- Example Row 2: Review (Livonia - 20% Focus) -->
+                    <tr>
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Tue</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">5-Star Review from Livonia Customer</td>
+                        <td class="editable text-sm text-sky-600" contenteditable="true">https://www.mechanicaltemp.com/livonia.html</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">Shout out to all our Livonia neighbors! We love hearing how happy you are with our heating service. Thank you, Sarah!</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">https://www.mechanicaltemp.com/</td>
+                    </tr>
+
+                    <!-- Example Row 3: Local Expert (Southfield - 80% Focus) -->
+                    <tr>
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Wed</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">Southfield Local Expert Spotlight</td>
+                        <td class="editable text-sm text-sky-600" contenteditable="true">https://www.mechanicaltemp.com/southfield.html</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">As Southfield locals, we understand Michigan winters! 🥶 Call the team that lives and works right here.</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">https://www.mechanicaltemp.com/</td>
+                    </tr>
+
+                    <!-- Editable Row 4 -->
+                    <tr>
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Thu</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">HVAC Quick Tip (Filter Change)</td>
+                        <td class="editable text-sm text-sky-600" contenteditable="true">https://www.mechanicaltemp.com/blog.html</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">Did you know a dirty air filter costs you money? We show you how to swap it out in 60 seconds! ⏱️</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">https://www.mechanicaltemp.com/</td>
+                    </tr>
+
+                    <!-- Editable Row 5 -->
+                    <tr>
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Fri</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">Service Plan Promotion (Soft Sell)</td>
+                        <td class="editable text-sm text-sky-600" contenteditable="true">https://www.mechanicaltemp.com/service-plan.html</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">Lock in your peace of mind before the weekend! Our plan includes everything your HVAC needs.</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">https://www.mechanicaltemp.com/</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <table class="min-w-full divide-y divide-gray-300 border border-gray-300 rounded-lg overflow-hidden">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 w-1/12">Day</th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-2/12">GBP Topic</th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-3/12">GBP Link (SEO Destination)</th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-4/12">Facebook Text (Hook/Engagement)</th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-2/12">Facebook Link</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-                
-                <!-- Example Row 1: Offer (Southfield) -->
-                <tr>
-                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Mon</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">$50 Off Any Repair (Southfield)</td>
-                    <td class="editable text-sm text-sky-600" contenteditable="true">https://www.mechanicaltemp.com/southfield.html</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">Who needs a reliable tech on speed dial? We're taking $50 OFF this week to prove we're the fastest in Southfield!</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">https://www.mechanicaltemp.com/</td>
-                </tr>
+        <!-- PHASE 3: PERFORMANCE REVIEW & SCALING -->
+        <div class="bg-white p-4 sm:p-6 rounded-b-xl shadow-lg mt-6">
+            <h2 class="text-xl font-bold mb-4 text-gray-700 border-b pb-2">🎯 Phase 3: Weekly Performance Review & Scaling</h2>
+            <p class="text-sm text-gray-600 mb-4">Check your GBP **Performance (Insights)** tab every Monday morning and record the results to plan your next week's content.</p>
+            
+            <table class="min-w-full divide-y divide-gray-300 border border-gray-300 rounded-lg overflow-hidden">
+                <thead class="bg-sky-50">
+                    <tr>
+                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 w-3/12">Key Metric</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-3/12">Question to Ask</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-2/12">Actual Count (Editable)</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-4/12">Next Week's Action (Editable)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    
+                    <!-- Metric 1: Calls -->
+                    <tr class="review-metric">
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-bold text-sky-800">Calls</td>
+                        <td class="text-sm text-gray-700">How many customers clicked the "Call" button?</td>
+                        <td class="editable text-lg font-extrabold text-red-600" contenteditable="true">XX</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">If high, run a similar offer, but target a new city (e.g., $50 Off Repair in Novi).</td>
+                    </tr>
 
-                <!-- Example Row 2: Review (Livonia - 20% Focus) -->
-                <tr>
-                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Tue</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">5-Star Review from Livonia Customer</td>
-                    <td class="editable text-sm text-sky-600" contenteditable="true">https://www.mechanicaltemp.com/livonia.html</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">Shout out to all our Livonia neighbors! We love hearing how happy you are with our heating service. Thank you, Sarah!</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">https://www.mechanicaltemp.com/</td>
-                </tr>
+                    <!-- Metric 2: Website Clicks -->
+                    <tr class="review-metric">
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-bold text-sky-800">Website Clicks</td>
+                        <td class="text-sm text-gray-700">How many customers clicked the link to your website?</td>
+                        <td class="editable text-lg font-extrabold text-red-600" contenteditable="true">YY</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">If high, create a V2 of the post topic (e.g., New Quick Tip on AC Repair).</td>
+                    </tr>
 
-                <!-- Example Row 3: Local Expert (Southfield - 80% Focus) -->
-                <tr>
-                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Wed</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">Southfield Local Expert Spotlight</td>
-                    <td class="editable text-sm text-sky-600" contenteditable="true">https://www.mechanicaltemp.com/southfield.html</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">As Southfield locals, we understand Michigan winters! 🥶 Call the team that lives and works right here.</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">https://www.mechanicaltemp.com/</td>
-                </tr>
-
-                <!-- Editable Row 4 -->
-                <tr>
-                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Thu</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">HVAC Quick Tip (Filter Change)</td>
-                    <td class="editable text-sm text-sky-600" contenteditable="true">https://www.mechanicaltemp.com/blog.html</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">Did you know a dirty air filter costs you money? We show you how to swap it out in 60 seconds! ⏱️</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">https://www.mechanicaltemp.com/</td>
-                </tr>
-
-                <!-- Editable Row 5 -->
-                <tr>
-                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Fri</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">Service Plan Promotion (Soft Sell)</td>
-                    <td class="editable text-sm text-sky-600" contenteditable="true">https://www.mechanicaltemp.com/service-plan.html</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">Lock in your peace of mind before the weekend! Our plan includes everything your HVAC needs.</td>
-                    <td class="editable text-sm text-gray-700" contenteditable="true">https://www.mechanicaltemp.com/</td>
-                </tr>
-            </tbody>
-        </table>
+                    <!-- Metric 3: Direction Requests -->
+                    <tr class="review-metric">
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-bold text-sky-800">Direction Requests</td>
+                        <td class="text-sm text-gray-700">How many people asked for directions to your office?</td>
+                        <td class="editable text-lg font-extrabold text-red-600" contenteditable="true">ZZ</td>
+                        <td class="editable text-sm text-gray-700" contenteditable="true">If high, continue local spotlight posts to reinforce Southfield HQ location.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <footer class="text-center text-sm text-gray-600 mt-8">
