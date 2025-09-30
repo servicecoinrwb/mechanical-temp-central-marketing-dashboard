@@ -74,7 +74,8 @@
                 <a href="./lead-funnel.html" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg transition">View Lead Funnel Guide</a>
                 <a href="./Weekly-Cross-Promotion-Planner.html" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg transition">Weekly Content Planner</a>
                 <a href="https://www.facebook.com/mechanicaltemp/?_rdr" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">Facebook</a>
-                <a href="https://github.com/servicecoinrwb/Mechanical-Temp-Website" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Website Admin</a>
+                <a href="https://business.facebook.com/latest/home?business_id=537436768160092&asset_id=227491970734407" target="_blank" class="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg transition">Meta Business Suite</a>
+                <a href="https://piccolo-spinach-k6p6.squarespace.com/config/" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Website Admin</a>
                 <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amechanicaltemp.com" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Search Console</a>
                 <a href="https://www.google.com/search?q=mechanical+temp" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Business Profile</a>
                 <a href="https://ads.google.com/aw/campaigns" target="_blank" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition">Google Ads</a>
@@ -93,7 +94,8 @@
                                     <tr><th class="p-3 border-b">City</th><th class="p-3 border-b">URL</th><th class="p-3 border-b">Status</th></tr>
                                 </thead>
                                 <tbody id="service-pages-table-body">
-                                    </tbody>
+                                    <!-- Cities will be loaded here by JavaScript -->
+                                </tbody>
                             </table>
                         </div>
                         <div class="mt-4 flex space-x-2">
@@ -103,7 +105,8 @@
 
                         <h3 class="text-xl font-semibold mt-6 mb-2">B. Content Strategy: Blog / Resource Center</h3>
                         <div class="space-y-2" id="blog-post-list">
-                             </div>
+                             <!-- Blog posts will be loaded here by JavaScript -->
+                        </div>
                          <div class="mt-4 flex space-x-2">
                             <input type="text" id="new-blog-post" placeholder="Enter new blog post title..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                             <button id="add-blog-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Add Post</button>
@@ -250,10 +253,10 @@
                        <div class="p-6">
                             <h2 class="text-2xl font-bold mb-4">🎯 Q4 2025 Goals</h2>
                             <ul class="list-disc list-inside space-y-2 text-gray-700">
-                                <li>Publish 2 new blog posts.</li>
-                                <li>Generate 15 qualified leads from Google Ads.</li>
-                                <li>Achieve a Cost Per Lead of under $75.</li>
-                                <li>Generate 10 new 5-star reviews on Google.</li>
+                               <li>Publish 2 new blog posts.</li>
+                               <li>Generate 15 qualified leads from Google Ads.</li>
+                               <li>Achieve a Cost Per Lead of under $75.</li>
+                               <li>Generate 10 new 5-star reviews on Google.</li>
                             </ul>
                        </div>
                 </div>
@@ -304,16 +307,7 @@
         const loadState = () => {
             // 1. Load Service Pages
             const savedPages = JSON.parse(localStorage.getItem('dashboard_servicePages')) || [
-                { city: 'Southfield' },
-                { city: 'Dearborn' },
-                { city: 'Livonia' },
-                { city: 'Novi' },
-                { city: 'Canton' },
-                { city: 'Plymouth' },
-                { city: 'Northville' },
-                { city: 'Westland' },
-                { city: 'Farmington Hills' },
-                { city: 'Redford' }
+                { city: 'Dearborn' }, { city: 'Southfield' }, { city: 'Novi' },
             ];
             renderServicePages(savedPages);
 
@@ -342,8 +336,8 @@
                 const newRow = document.createElement('tr');
                 newRow.classList.add('hover:bg-gray-50');
                 const slug = page.city.toLowerCase().replace(/\s+/g, '-');
-                const newUrl = `https://mechanicaltemp.com/${slug}.html`;
-                newRow.innerHTML = `<td class="p-3 border-b">${page.city}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}.html</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
+                const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
+                newRow.innerHTML = `<td class="p-3 border-b">${page.city}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
                 tableBody.appendChild(newRow);
             });
         };
@@ -415,10 +409,10 @@
             });
             
              document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
-                 select.addEventListener('change', function() {
-                     updateSelectAppearance(this);
-                 });
-             });
+                select.addEventListener('change', function() {
+                    updateSelectAppearance(this);
+                });
+            });
         }
         
         // --- AI CHAT ---
@@ -459,7 +453,7 @@
             chatHistory.scrollTop = chatHistory.scrollHeight;
             
             try {
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 const systemPrompt = "You are a world-class marketing assistant for Mechanical Temp, a small HVAC company based in Metro Detroit. Your goal is to provide creative and practical marketing ideas. Be concise, friendly, and focus on strategies that deliver real value. Generate blog post titles, ad copy, social media posts, and other marketing content on request. Format your responses with simple HTML like <p>, <ul>, <li>, and <strong> for readability.";
                 const payload = {
                     contents: [{ parts: [{ text: userPrompt }] }],
@@ -496,3 +490,4 @@
     </script>
 </body>
 </html>
+
