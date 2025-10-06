@@ -74,10 +74,11 @@
                 <a href="./lead-funnel.html" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg transition">View Lead Funnel Guide</a>
                 <a href="./Weekly-Cross-Promotion-Planner.html" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg transition">Weekly Content Planner</a>
                 <a href="https://www.facebook.com/mechanicaltemp/?_rdr" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">Facebook</a>
-                <a href="https://publish.buffer.com/channels/68d52c9864332ee3985b5fa3?tab=queue" target="_blank" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition">Buffer Queue</a>
-                <a href="https://github.com/servicecoinrwb/Mechanical-Temp-Website" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Website Admin</a>
+                <a href="https://business.facebook.com/latest/home?business_id=537436768160092&asset_id=227491970734407" target="_blank" class="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg transition">Meta Business Suite</a>
+                <a href="https://piccolo-spinach-k6p6.squarespace.com/config/" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Website Admin</a>
                 <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amechanicaltemp.com" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Search Console</a>
                 <a href="https://www.google.com/search?q=mechanical+temp" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg transition">Business Profile</a>
+                <a href="https://analytics.google.com/analytics/web/#/a370538021p507640648/reports/intelligenthome?params=_u..nav%3Dmaui" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition">Google Analytics</a>
                 <a href="https://ads.google.com/aw/campaigns" target="_blank" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition">Google Ads</a>
             </div>
         </header>
@@ -253,10 +254,10 @@
                        <div class="p-6">
                             <h2 class="text-2xl font-bold mb-4">🎯 Q4 2025 Goals</h2>
                             <ul class="list-disc list-inside space-y-2 text-gray-700">
-                                <li>Publish 2 new blog posts.</li>
-                                <li>Generate 15 qualified leads from Google Ads.</li>
-                                <li>Achieve a Cost Per Lead of under $75.</li>
-                                <li>Generate 10 new 5-star reviews on Google.</li>
+                               <li>Publish 2 new blog posts.</li>
+                               <li>Generate 15 qualified leads from Google Ads.</li>
+                               <li>Achieve a Cost Per Lead of under $75.</li>
+                               <li>Generate 10 new 5-star reviews on Google.</li>
                             </ul>
                        </div>
                 </div>
@@ -307,16 +308,7 @@
         const loadState = () => {
             // 1. Load Service Pages
             const savedPages = JSON.parse(localStorage.getItem('dashboard_servicePages')) || [
-                { city: 'Southfield' },
-                { city: 'Dearborn' },
-                { city: 'Livonia' },
-                { city: 'Novi' },
-                { city: 'Canton' },
-                { city: 'Plymouth' },
-                { city: 'Northville' },
-                { city: 'Westland' },
-                { city: 'Farmington Hills' },
-                { city: 'Redford' }
+                { city: 'Dearborn' }, { city: 'Southfield' }, { city: 'Novi' },
             ];
             renderServicePages(savedPages);
 
@@ -345,8 +337,8 @@
                 const newRow = document.createElement('tr');
                 newRow.classList.add('hover:bg-gray-50');
                 const slug = page.city.toLowerCase().replace(/\s+/g, '-');
-                const newUrl = `https://mechanicaltemp.com/${slug}.html`;
-                newRow.innerHTML = `<td class="p-3 border-b">${page.city}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}.html</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
+                const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
+                newRow.innerHTML = `<td class="p-3 border-b">${page.city}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
                 tableBody.appendChild(newRow);
             });
         };
@@ -418,10 +410,10 @@
             });
             
              document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
-                 select.addEventListener('change', function() {
-                     updateSelectAppearance(this);
-                 });
-             });
+                select.addEventListener('change', function() {
+                    updateSelectAppearance(this);
+                });
+            });
         }
         
         // --- AI CHAT ---
@@ -429,7 +421,7 @@
         const chatInput = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
         // IMPORTANT: PASTE YOUR GOOGLE AI API KEY HERE to enable the AI assistant when running locally.
-        const GEMINI_API_KEY = "YOUR_API_KEY_HERE"; // Get your key from https://aistudio.google.com/
+        const GEMINI_API_KEY = "AIzaSyCRYKBzfVAT4J0WbiDM4EEtf-Ngtzw9obo"; // Get your key from https://aistudio.google.com/
 
         const handleSend = async () => {
             const userPrompt = chatInput.value.trim();
@@ -499,3 +491,4 @@
     </script>
 </body>
 </html>
+
