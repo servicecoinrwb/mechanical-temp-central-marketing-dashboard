@@ -133,10 +133,18 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, collection, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, collection, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- CONFIG & INITIALIZATION ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", projectId: "YOUR_PROJECT_ID" };
+        // Using the mandated global variables, with a fallback structure using the configuration provided by the user.
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBzdlUM5xDJU5sR42Rrr2QU7cNDwBWJQTk",
+            authDomain: "nonprod2-svc-3nhd.firebaseapp.com",
+            projectId: "nonprod2-svc-3nhd",
+            storageBucket: "nonprod2-svc-3nhd.firebasestorage.app",
+            messagingSenderId: "1065789866575",
+            appId: "1:1065789866575:web:9648b7b79f9225967f603a"
+        };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         const app = initializeApp(firebaseConfig);
@@ -194,30 +202,38 @@
                 setupExpenseListener();
             } else {
                 try {
+                    // Sign in using the provided custom token or anonymously as a fallback
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                         await signInWithCustomToken(auth, __initial_auth_token);
                     } else {
                         await signInAnonymously(auth);
                     }
                 } catch (error) {
+                    // The API key error should now be resolved due to the updated config.
                     console.error("Authentication Error: ", error);
                 }
             }
         });
 
-        // --- FIRESTORE OPERATIONS ---
+        // --- FIRESTORE OPERATIONS & LISTENER SETUP ---
         function setupExpenseListener() {
             if (!currentUserId) return;
             if (unsubscribeExpenses) unsubscribeExpenses(); // Unsubscribe from previous listener
 
             expensesCollectionRef = collection(db, `artifacts/${appId}/users/${currentUserId}/expenses`);
-            const q = query(expensesCollectionRef, orderBy('date', 'desc'));
+            // We removed orderBy() from the query to prevent potential Firestore index errors,
+            // and will instead sort the results in memory.
+            const q = query(expensesCollectionRef);
 
             unsubscribeExpenses = onSnapshot(q, (snapshot) => {
                 const expenses = [];
                 snapshot.forEach(doc => {
                     expenses.push({ id: doc.id, ...doc.data() });
                 });
+                
+                // Client-side sorting by date (descending)
+                expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+
                 renderExpenses(expenses);
                 updateSummary(expenses);
                 updateChart(expenses);
@@ -303,7 +319,7 @@
                         document.getElementById('amount').value = expense.amount;
                         openModal(expenseModal);
                     });
-                     tr.querySelector('.delete-btn').addEventListener('click', () => {
+                    tr.querySelector('.delete-btn').addEventListener('click', () => {
                         expenseToDeleteId = expense.id;
                         openModal(deleteModal);
                     });
