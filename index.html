@@ -52,14 +52,6 @@
         th {
             background-color: #f9fafb;
         }
-        /* AI Chat Styles */
-        .chat-history { height: 300px; overflow-y: auto; }
-        .user-msg { background-color: #e0f2fe; text-align: right; }
-        .ai-msg { background-color: #f3f4f6; }
-        .loading-dots div { animation: blink 1.4s infinite both; }
-        .loading-dots div:nth-child(2) { animation-delay: 0.2s; }
-        .loading-dots div:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
         
         /* Error Banner */
         #auth-error { display: none; }
@@ -222,17 +214,9 @@
             <div class="space-y-8">
                 <div class="dashboard-card">
                     <div class="p-6">
-                        <h2 class="text-2xl font-bold mb-4">Pillar 6: AI Marketing Assistant</h2>
-                        <div class="chat-history p-4 bg-gray-100 rounded-lg border" id="chat-history">
-                           <div class="ai-msg p-3 rounded-lg mb-2">
-                                <p class="font-semibold text-gray-800">Hello!</p>
-                                <p class="text-gray-700">How can I help you with your marketing today? Ask me to write ad copy, suggest blog topics, or draft a social media post.</p>
-                           </div>
-                        </div>
-                        <div class="mt-4 flex space-x-2">
-                            <input type="text" id="chat-input" placeholder="Ask for a blog post idea..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <button id="send-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Send</button>
-                        </div>
+                        <h2 class="text-2xl font-bold mb-4">Pillar 6: Strategy & Brainstorming</h2>
+                        <p class="text-gray-600 text-sm mb-2">Use this shared space to jot down campaign ideas, email drafts, or meeting notes. It saves automatically.</p>
+                        <textarea id="strategy-notes" class="w-full h-64 p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-700 leading-relaxed" placeholder="Type your ideas here..."></textarea>
                     </div>
                 </div>
 
@@ -356,14 +340,8 @@
             }
         });
 
-        const initAuth = async () => {
-           // Optional: Add anonymous fallback here if needed in future
-        };
-
-        // --- Gemini AI Key ---
-        // IMPORTANT: Replace the text below with your actual key starting with AIzaSy...
-        const apiKey = "AIzaSyCA_ZrK5xTCKD5OqL-HaLtRDFBK99GCjtI"; 
-
+        // No API Key needed anymore!
+        
         const showError = (msg) => {
             const errorBanner = document.getElementById('auth-error');
             errorBanner.innerHTML = `<p class="font-bold">Error</p><p>${msg}</p>`;
@@ -419,6 +397,9 @@
                     const adGroupName = select.closest('tr').cells[0].textContent;
                     adGroupStatuses[adGroupName] = select.value;
                 });
+                
+                // Capture Notes
+                const notes = document.getElementById('strategy-notes').value;
 
                 try {
                     await setDoc(docRef, {
@@ -426,6 +407,7 @@
                         blogPosts,
                         checkboxStates,
                         adGroupStatuses,
+                        notes,
                         lastUpdated: new Date()
                     });
                     console.log("Saved to Firebase");
@@ -487,6 +469,12 @@
                                 updateSelectAppearance(select);
                             });
                         }
+                        
+                        // Load Notes
+                        if (data.notes) {
+                             document.getElementById('strategy-notes').value = data.notes;
+                        }
+                        
                     } else {
                         console.log("Database document created (waiting for input)");
                     }
@@ -535,98 +523,15 @@
                         saveState();
                     }
                 });
-            }
-
-            const chatHistory = document.getElementById('chat-history');
-            const chatInput = document.getElementById('chat-input');
-            const sendBtn = document.getElementById('send-btn');
-
-            const handleSend = async () => {
-                const userPrompt = chatInput.value.trim();
-                if (!userPrompt) return;
-
-                const userMsgDiv = document.createElement('div');
-                userMsgDiv.className = 'user-msg p-3 rounded-lg mb-2';
-                userMsgDiv.innerHTML = `<p class="font-semibold text-sky-800">You</p><p class="text-gray-700">${userPrompt}</p>`;
-                chatHistory.appendChild(userMsgDiv);
-                chatInput.value = '';
-                chatHistory.scrollTop = chatHistory.scrollHeight;
-
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'ai-msg p-3 rounded-lg mb-2 flex items-center space-x-2';
-                loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant</p><div class="loading-dots flex space-x-1"><div class="w-2 h-2 bg-gray-500 rounded-full"></div><div class="w-2 h-2 bg-gray-500 rounded-full"></div><div class="w-2 h-2 bg-gray-500 rounded-full"></div></div>`;
-                chatHistory.appendChild(loadingDiv);
-                chatHistory.scrollTop = chatHistory.scrollHeight;
                 
-                try {
-                    const fetchWithRetry = async (url, options, retries = 5, delay = 1000) => {
-                        try {
-                            const response = await fetch(url, options);
-                            if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
-                                throw new Error(`Retryable error: ${response.status}`);
-                            }
-                            return response;
-                        } catch (error) {
-                            if (retries > 0) {
-                                await new Promise(resolve => setTimeout(resolve, delay));
-                                return fetchWithRetry(url, options, retries - 1, delay * 2);
-                            }
-                            throw error;
-                        }
-                    };
-
-                    // Attempt Primary Model, Fallback to Pro if it fails
-                    const models = ['gemini-1.5-flash-latest', 'gemini-1.5-flash', 'gemini-pro'];
-                    let response = null;
-                    let usedModel = '';
-
-                    for (const model of models) {
-                        try {
-                            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-                            const payload = {
-                                contents: [{ parts: [{ text: userPrompt }] }],
-                                systemInstruction: { parts: [{ text: "You are a helpful marketing assistant." }] }
-                            };
-                            
-                            // Note: gemini-pro might not support systemInstruction in some versions, 
-                            // but let's try consistent payload first.
-                            
-                            const res = await fetchWithRetry(apiUrl, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(payload)
-                            }, 1); // Quick retry locally, rely on loop for model fallback
-                            
-                            if (res.ok) {
-                                response = res;
-                                usedModel = model;
-                                break;
-                            }
-                        } catch (e) {
-                            console.warn(`Model ${model} failed, trying next...`);
-                        }
-                    }
-
-                    if (!response || !response.ok) throw new Error(`All models failed. Last status: ${response ? response.status : 'Network Error'}`);
-
-                    const result = await response.json();
-                    const aiText = result.candidates[0].content.parts[0].text;
-                    loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant (${usedModel})</p><div class="text-gray-700">${aiText}</div>`;
-                } catch (error) {
-                    console.error('Error:', error);
-                    let errorMsg = "Could not connect to AI.";
-                    if (apiKey.includes("PASTE_YOUR")) errorMsg = "Missing API Key. Please edit the HTML and paste your key.";
-                    else if (error.message.includes("404")) errorMsg = "Models not found. Ensure API is enabled in Google Cloud.";
-                    
-                    loadingDiv.innerHTML = `<p class="font-semibold text-red-800">Error</p><p class="text-red-700">${errorMsg}</p>`;
+                // Save notes on typing
+                const notesArea = document.getElementById('strategy-notes');
+                if(notesArea) {
+                    notesArea.addEventListener('input', () => {
+                         saveState();
+                    });
                 }
-                chatHistory.scrollTop = chatHistory.scrollHeight;
-            };
-
-            sendBtn.addEventListener('click', handleSend);
-            chatInput.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter') handleSend();
-            });
+            }
 
             setupEventListeners();
         });
