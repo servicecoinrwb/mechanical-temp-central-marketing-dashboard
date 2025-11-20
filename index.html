@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mechanical Temp - Marketing Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fix Favicon 404 -->
+    <link rel="icon" href="data:,">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
@@ -296,7 +298,6 @@
         import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
         // 2. INITIALIZE FIREBASE
-        // Paste your specific config object here if it's different
         const firebaseConfig = {
              apiKey: "AIzaSyBEjJhmkhRJfTzDyscwqiVvuf1YkFAX5Ro",
              authDomain: "gen-lang-client-0527243008.firebaseapp.com",
@@ -307,7 +308,6 @@
              measurementId: "G-353V9E57VG"
         };
         
-        // On GitHub, we default to a static app ID
         const appId = 'mechanical-temp-dashboard';
 
         const app = initializeApp(firebaseConfig);
@@ -316,13 +316,10 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
         
-        // Variable to hold our docRef once we are authenticated and have a userId
         let docRef = null;
-        let unsubscribeSnapshot = null; // To stop listening when user logs out
+        let unsubscribeSnapshot = null;
 
         // --- AUTHENTICATION LOGIC ---
-        
-        // 1. Button Event Listeners
         const btnGoogleLogin = document.getElementById('btn-google-login');
         const btnLogout = document.getElementById('btn-logout');
         const authContainer = document.getElementById('auth-container');
@@ -347,27 +344,14 @@
             }
         });
 
-        // 2. Init Auth (Auto-login check)
         const initAuth = async () => {
-            // We don't auto-sign-in anonymously anymore if we want Google Auth to be primary.
-            // However, to keep the app working for visitors, we can fallback to anonymous.
-            // NOTE: If you previously used anonymous, switching to Google creates a NEW user ID (new data).
-            
-            // For now, we wait for onAuthStateChanged. 
-            // If no user is logged in, we could trigger anonymous login, 
-            // BUT that might annoy people trying to click "Google Login".
-            // Better approach: Let them click "Login". 
-            // If you want public read-only, that requires different rules.
-            // For this dashboard, let's just auto-login anonymously if no one is logged in,
-            // BUT give them the option to "Upgrade" to Google. 
-            // Actually, simplest for now: If not logged in, stay logged out until they click.
+           // Optional: Add anonymous fallback here if needed in future
         };
 
         // --- Gemini AI Key ---
-        // PASTE YOUR NEW KEY HERE
+        // IMPORTANT: Replace the text below with your actual key starting with AIzaSy...
         const apiKey = "AIzaSyCA_ZrK5xTCKD5OqL-HaLtRDFBK99GCjtI"; 
 
-        // Helper to show errors
         const showError = (msg) => {
             const errorBanner = document.getElementById('auth-error');
             errorBanner.innerHTML = `<p class="font-bold">Error</p><p>${msg}</p>`;
@@ -376,45 +360,30 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             
-            // Listen for auth state changes
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     console.log("User authenticated:", user.uid);
                     document.getElementById('auth-error').style.display = 'none';
                     
-                    // Update UI
-                    btnGoogleLogin.classList.add('hidden'); // Hide login button
-                    userDisplay.style.display = 'flex';     // Show user info
+                    btnGoogleLogin.classList.add('hidden');
+                    userDisplay.style.display = 'flex';
                     userName.textContent = user.displayName || "Anonymous";
                     if (user.photoURL) userPhoto.src = user.photoURL;
                     
-                    // IMPORTANT: We use the USER specific path to allow writes
                     docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'marketing_dashboard', 'main');
-                    
-                    // Initialize the real-time listener
                     initRealtimeListener();
                 } else {
                     console.log("User signed out");
-                    
-                    // Update UI
                     btnGoogleLogin.classList.remove('hidden');
                     userDisplay.style.display = 'none';
-                    
-                    // Stop listening to DB
                     if(unsubscribeSnapshot) unsubscribeSnapshot();
                     docRef = null;
-                    
-                    // Clear the board visually or show "Login to view data"
-                    // For now we leave it stale or clear it:
-                    // document.getElementById('service-pages-table-body').innerHTML = '';
                 }
             });
 
-            // --- SAVE FUNCTION ---
             const saveState = async () => {
-                if (!docRef) return; // Don't save if not authenticated
+                if (!docRef) return; 
 
-                // Gather Data
                 const servicePages = [];
                 document.querySelectorAll('#service-pages-table-body tr').forEach(row => {
                     const city = row.cells[0].textContent;
@@ -451,12 +420,11 @@
                 } catch (e) {
                     console.error("Error saving to database: ", e);
                     if(e.code === 'permission-denied') {
-                        showError("Permission Denied. You are logged in, but the database rules are rejecting your write. Check Firestore Rules.");
+                        showError("Permission Denied. Database rules rejected the write.");
                     }
                 }
             };
 
-            // --- LOAD FUNCTION ---
             const initRealtimeListener = () => {
                 if (!docRef) return;
 
@@ -464,7 +432,6 @@
                     if (docSnapshot.exists()) {
                         const data = docSnapshot.data();
                         
-                        // Render Service Pages
                         const tableBody = document.getElementById('service-pages-table-body');
                         tableBody.innerHTML = '';
                         if(data.servicePages) {
@@ -478,7 +445,6 @@
                             });
                         }
 
-                        // Render Blog Posts
                         const blogList = document.getElementById('blog-post-list');
                         blogList.innerHTML = '';
                         if(data.blogPosts) {
@@ -493,7 +459,6 @@
                             document.querySelectorAll('#blog-post-list .task-checkbox').forEach(el => el.addEventListener('change', saveState));
                         }
 
-                        // Render Checkboxes
                         if(data.checkboxStates) {
                             for (const id in data.checkboxStates) {
                                 const checkbox = document.getElementById(id);
@@ -501,7 +466,6 @@
                             }
                         }
 
-                        // Render Ad Groups
                         if(data.adGroupStatuses) {
                             document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
                                 const adGroupName = select.closest('tr').cells[0].textContent;
@@ -524,7 +488,6 @@
                 selectElement.classList.add(selectElement.value === 'active' ? 'status-active' : 'status-paused');
             };
 
-            // --- SETUP LISTENERS ---
             function setupEventListeners() {
                 document.getElementById('add-city-btn').addEventListener('click', () => {
                     const cityNameInput = document.getElementById('new-city-name');
@@ -562,7 +525,6 @@
                 });
             }
 
-            // --- AI CHAT LOGIC ---
             const chatHistory = document.getElementById('chat-history');
             const chatInput = document.getElementById('chat-input');
             const sendBtn = document.getElementById('send-btn');
@@ -585,7 +547,6 @@
                 chatHistory.scrollTop = chatHistory.scrollHeight;
                 
                 try {
-                    // Exponential backoff implementation for API retries
                     const fetchWithRetry = async (url, options, retries = 5, delay = 1000) => {
                         try {
                             const response = await fetch(url, options);
@@ -602,7 +563,8 @@
                         }
                     };
 
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                    // Use Standard Gemini 1.5 Flash Model
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
                     const systemPrompt = "You are a world-class marketing assistant for Mechanical Temp. Keep it brief and helpful.";
                     const payload = {
                         contents: [{ parts: [{ text: userPrompt }] }],
@@ -622,8 +584,10 @@
                     loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant</p><div class="text-gray-700">${aiText}</div>`;
                 } catch (error) {
                     console.error('Error:', error);
-                    // Provide instruction if key is missing or invalid
-                    const errorMsg = apiKey ? "Could not connect to AI. Check console." : "Missing API Key. Please add your Gemini API key to the code.";
+                    let errorMsg = "Could not connect to AI.";
+                    if (apiKey.includes("PASTE_YOUR")) errorMsg = "Missing API Key. Please edit the HTML and paste your key.";
+                    else if (error.message.includes("400")) errorMsg = "Bad Request. Your API key might be invalid.";
+                    
                     loadingDiv.innerHTML = `<p class="font-semibold text-red-800">Error</p><p class="text-red-700">${errorMsg}</p>`;
                 }
                 chatHistory.scrollTop = chatHistory.scrollHeight;
