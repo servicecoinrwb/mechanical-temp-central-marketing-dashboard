@@ -31,7 +31,6 @@
             text-align: center;
         }
         .status-live { background-color: #dcfce7; color: #166534; }
-        .status-draft { background-color: #fef9c3; color: #854d0e; }
         
         .status-select {
             -webkit-appearance: none;
@@ -59,7 +58,6 @@
         .loading-dots div:nth-child(2) { animation-delay: 0.2s; }
         .loading-dots div:nth-child(3) { animation-delay: 0.4s; }
         @keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
-
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -98,7 +96,7 @@
                                     <tr><th class="p-3 border-b">City</th><th class="p-3 border-b">URL</th><th class="p-3 border-b">Status</th></tr>
                                 </thead>
                                 <tbody id="service-pages-table-body">
-                                    <!-- Cities will be loaded here by JavaScript -->
+                                    <!-- Cities loaded from Firebase -->
                                 </tbody>
                             </table>
                         </div>
@@ -109,7 +107,7 @@
 
                         <h3 class="text-xl font-semibold mt-6 mb-2">B. Content Strategy: Blog / Resource Center</h3>
                         <div class="space-y-2" id="blog-post-list">
-                             <!-- Blog posts will be loaded here by JavaScript -->
+                             <!-- Blog posts loaded from Firebase -->
                         </div>
                          <div class="mt-4 flex space-x-2">
                             <input type="text" id="new-blog-post" placeholder="Enter new blog post title..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
@@ -126,8 +124,8 @@
                         <h2 class="text-2xl font-bold mb-4">Pillar 5: Google Ads (Paid Search)</h2>
                          <h3 class="text-xl font-semibold mb-2">A. Campaign Foundation</h3>
                         <div class="space-y-2">
-                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-1" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-1" class="ml-3 text-gray-700">High-Converting Landing Page Live (<a href="https://promo.mechanicaltemp.com" target="_blank" class="text-blue-600 hover:underline">promo.mechanicaltemp.com</a>)</label></div>
-                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-2" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-2" class="ml-3 text-gray-700">Conversion Tracking Installed (Calls & Forms)</label></div>
+                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-1" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-1" class="ml-3 text-gray-700">High-Converting Landing Page Live</label></div>
+                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-2" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-2" class="ml-3 text-gray-700">Conversion Tracking Installed</label></div>
                              <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-3" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-3" class="ml-3 text-gray-700">LSA Campaign Paused to focus budget</label></div>
                         </div>
                          <h3 class="text-xl font-semibold mt-6 mb-2">B. Active Campaign Management (Weekly Tasks)</h3>
@@ -204,7 +202,7 @@
                 </div>
 
                 <div class="dashboard-card">
-                       <div class="p-6">
+                        <div class="p-6">
                             <h2 class="text-2xl font-bold mb-4">Pillar 2: Off-Page SEO (Local)</h2>
                             <h3 class="text-xl font-semibold mb-2">A. Google Business Profile (Weekly)</h3>
                             <div class="space-y-2">
@@ -268,230 +266,281 @@
         </div>
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    <!-- FIREBASE INTEGRATION -->
+    <script type="module">
+        // 1. Import Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-        // --- DATA PERSISTENCE USING LOCALSTORAGE ---
-
-        const saveState = () => {
-            // 1. Save Service Pages
-            const servicePages = [];
-            document.querySelectorAll('#service-pages-table-body tr').forEach(row => {
-                const city = row.cells[0].textContent;
-                servicePages.push({ city });
-            });
-            localStorage.setItem('dashboard_servicePages', JSON.stringify(servicePages));
-
-            // 2. Save Blog Posts
-            const blogPosts = [];
-            document.querySelectorAll('#blog-post-list .task-item').forEach(item => {
-                const title = item.querySelector('a').textContent;
-                const checked = item.querySelector('input').checked;
-                blogPosts.push({ title, checked });
-            });
-            localStorage.setItem('dashboard_blogPosts', JSON.stringify(blogPosts));
-
-            // 3. Save Checkboxes
-            const checkboxStates = {};
-            document.querySelectorAll('.task-checkbox').forEach(box => {
-                checkboxStates[box.id] = box.checked;
-            });
-            localStorage.setItem('dashboard_checkboxStates', JSON.stringify(checkboxStates));
-
-            // 4. Save Ad Group Statuses
-            const adGroupStatuses = {};
-            document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
-                const adGroupName = select.closest('tr').cells[0].textContent;
-                adGroupStatuses[adGroupName] = select.value;
-            });
-            localStorage.setItem('dashboard_adGroupStatuses', JSON.stringify(adGroupStatuses));
-             console.log("State saved to localStorage!");
-        };
-
-        const loadState = () => {
-            // 1. Load Service Pages
-            const savedPages = JSON.parse(localStorage.getItem('dashboard_servicePages')) || [
-                { city: 'Dearborn' }, { city: 'Southfield' }, { city: 'Novi' },
-            ];
-            renderServicePages(savedPages);
-
-            // 2. Load Blog Posts
-            const savedPosts = JSON.parse(localStorage.getItem('dashboard_blogPosts')) || [
-                { title: 'How to Prepare Your Furnace for a Michigan Winter', checked: false },
-                { title: "Is My AC Ready for Michigan's Humid Summers?", checked: false },
-            ];
-            renderBlogPosts(savedPosts);
-
-            // 3. Load Checkboxes
-            const savedCheckboxes = JSON.parse(localStorage.getItem('dashboard_checkboxStates')) || {};
-            renderCheckboxes(savedCheckboxes);
-
-            // 4. Load Ad Group Statuses
-            const savedAdGroups = JSON.parse(localStorage.getItem('dashboard_adGroupStatuses')) || {};
-            renderAdGroups(savedAdGroups);
-             console.log("State loaded from localStorage!");
-        };
-
-        // --- RENDERING FUNCTIONS ---
-        const renderServicePages = (pages) => {
-            const tableBody = document.getElementById('service-pages-table-body');
-            tableBody.innerHTML = '';
-            pages.forEach(page => {
-                const newRow = document.createElement('tr');
-                newRow.classList.add('hover:bg-gray-50');
-                const slug = page.city.toLowerCase().replace(/\s+/g, '-');
-                const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
-                newRow.innerHTML = `<td class="p-3 border-b">${page.city}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
-                tableBody.appendChild(newRow);
-            });
-        };
-
-        const renderBlogPosts = (posts) => {
-            const blogList = document.getElementById('blog-post-list');
-            blogList.innerHTML = '';
-            posts.forEach(post => {
-                const newItem = document.createElement('div');
-                newItem.classList.add('task-item', 'flex', 'items-center');
-                const newId = 'task-blog-' + post.title.replace(/\s+/g, '-').toLowerCase();
-                newItem.innerHTML = `<input id="${newId}" type="checkbox" class="h-4 w-4 rounded task-checkbox" ${post.checked ? 'checked' : ''}><label class="ml-3 text-gray-700"><a href="https://piccolo-spinach-k6p6.squarespace.com/config/pages/64bafe92999de952790fe6fb" target="_blank" class="hover:underline text-blue-600">${post.title}</a></label>`;
-                blogList.appendChild(newItem);
-            });
-            // Re-attach listeners after rendering
-            document.querySelectorAll('#blog-post-list .task-checkbox').forEach(el => el.addEventListener('change', saveState));
-        };
-
-        const renderCheckboxes = (states) => {
-            for (const id in states) {
-                const checkbox = document.getElementById(id);
-                if (checkbox) checkbox.checked = states[id];
-            }
-        };
-
-        const updateSelectAppearance = (selectElement) => {
-            selectElement.classList.remove('status-active', 'status-paused');
-            selectElement.classList.add(selectElement.value === 'active' ? 'status-active' : 'status-paused');
-        };
-
-        const renderAdGroups = (statuses) => {
-            document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
-                const adGroupName = select.closest('tr').cells[0].textContent;
-                if (statuses[adGroupName]) {
-                    select.value = statuses[adGroupName];
-                }
-                updateSelectAppearance(select);
-            });
+        // 2. INITIALIZE FIREBASE
+        // We prioritize the environment configuration to ensure permissions work correctly.
+        // If you are running this locally outside the tool, you might need to provide your own config object.
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+             apiKey: "AIzaSyBEjJhmkhRJfTzDyscwqiVvuf1YkFAX5Ro",
+             authDomain: "gen-lang-client-0527243008.firebaseapp.com",
+             projectId: "gen-lang-client-0527243008",
+             storageBucket: "gen-lang-client-0527243008.firebasestorage.app",
+             messagingSenderId: "364776086784",
+             appId: "1:364776086784:web:5fff5cf8938440e6bb27e5",
+             measurementId: "G-353V9E57VG"
         };
         
-        // --- EVENT LISTENERS SETUP ---
-        function setupEventListeners() {
-            document.getElementById('add-city-btn').addEventListener('click', () => {
-                const cityNameInput = document.getElementById('new-city-name');
-                const cityName = cityNameInput.value.trim();
-                if (cityName) {
-                    const currentPages = JSON.parse(localStorage.getItem('dashboard_servicePages')) || [];
-                    currentPages.push({ city: cityName });
-                    renderServicePages(currentPages);
-                    cityNameInput.value = '';
-                    saveState();
-                }
-            });
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app';
 
-            document.getElementById('add-blog-btn').addEventListener('click', () => {
-                const blogPostInput = document.getElementById('new-blog-post');
-                const postTitle = blogPostInput.value.trim();
-                if (postTitle) {
-                    const currentPosts = JSON.parse(localStorage.getItem('dashboard_blogPosts')) || [];
-                    currentPosts.push({ title: postTitle, checked: false });
-                    renderBlogPosts(currentPosts);
-                    blogPostInput.value = '';
-                    saveState();
-                }
-            });
-
-            document.querySelectorAll('.task-checkbox, .status-select').forEach(element => {
-                element.addEventListener('change', saveState);
-            });
-            
-             document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
-                select.addEventListener('change', function() {
-                    updateSelectAppearance(this);
-                });
-            });
-        }
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
         
-        // --- AI CHAT ---
-        const chatHistory = document.getElementById('chat-history');
-        const chatInput = document.getElementById('chat-input');
-        const sendBtn = document.getElementById('send-btn');
-        // IMPORTANT: PASTE YOUR GOOGLE AI API KEY HERE to enable the AI assistant when running locally.
-        const GEMINI_API_KEY = "AIzaSyCA_ZrK5xTCKD5OqL-HaLtRDFBK99GCjtI"; // Get your key from https://aistudio.google.com/
+        // Variable to hold our docRef once we are authenticated and have a userId
+        let docRef = null;
 
-        const handleSend = async () => {
-            const userPrompt = chatInput.value.trim();
-            // In a real preview environment, a key might be injected globally. 
-            // We check our constant first.
-            const apiKey = GEMINI_API_KEY !== "YOUR_API_KEY_HERE" ? GEMINI_API_KEY : (typeof __GEMINI_API_KEY__ !== 'undefined' ? __GEMINI_API_KEY__ : "");
-
-            if (!userPrompt) return;
-            
-            if (!apiKey) {
-                 const aiErrorDiv = document.createElement('div');
-                 aiErrorDiv.className = 'ai-msg p-3 rounded-lg mb-2';
-                 aiErrorDiv.innerHTML = `<p class="font-semibold text-red-800">Configuration Error</p><p class="text-red-700">The AI Assistant is not configured. Please add a valid Gemini API key to the 'GEMINI_API_KEY' variable in the HTML file to use this feature.</p>`;
-                 chatHistory.appendChild(aiErrorDiv);
-                 chatHistory.scrollTop = chatHistory.scrollHeight;
-                 return;
-            }
-
-            const userMsgDiv = document.createElement('div');
-            userMsgDiv.className = 'user-msg p-3 rounded-lg mb-2';
-            userMsgDiv.innerHTML = `<p class="font-semibold text-sky-800">You</p><p class="text-gray-700">${userPrompt}</p>`;
-            chatHistory.appendChild(userMsgDiv);
-            chatInput.value = '';
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'ai-msg p-3 rounded-lg mb-2 flex items-center space-x-2';
-            loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant</p><div class="loading-dots flex space-x-1"><div class="w-2 h-2 bg-gray-500 rounded-full"></div><div class="w-2 h-2 bg-gray-500 rounded-full"></div><div class="w-2 h-2 bg-gray-500 rounded-full"></div></div>`;
-            chatHistory.appendChild(loadingDiv);
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-            
+        // --- AUTHENTICATION LOGIC ---
+        const initAuth = async () => {
             try {
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                const systemPrompt = "You are a world-class marketing assistant for Mechanical Temp, a small HVAC company based in Metro Detroit. Your goal is to provide creative and practical marketing ideas. Be concise, friendly, and focus on strategies that deliver real value. Generate blog post titles, ad copy, social media posts, and other marketing content on request. Format your responses with simple HTML like <p>, <ul>, <li>, and <strong> for readability.";
-                const payload = {
-                    contents: [{ parts: [{ text: userPrompt }] }],
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
-                };
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) throw new Error(`API error: ${response.statusText} (${response.status})`);
-
-                const result = await response.json();
-                const aiText = result.candidates[0].content.parts[0].text;
-                loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant</p><div class="text-gray-700">${aiText}</div>`;
+                // Use custom token if provided (for authenticated environment users)
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    // Fallback for anonymous usage
+                    await signInAnonymously(auth);
+                }
             } catch (error) {
-                console.error('Error fetching AI response:', error);
-                loadingDiv.innerHTML = `<p class="font-semibold text-red-800">Error</p><p class="text-red-700">Sorry, I couldn't get a response. The API key may be invalid or the service may be unavailable. Please check the console for details.</p>`;
+                console.error("Auth failed:", error);
             }
-            chatHistory.scrollTop = chatHistory.scrollHeight;
         };
 
-        sendBtn.addEventListener('click', handleSend);
-        chatInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') handleSend();
-        });
+        // --- Gemini AI Key ---
+        // Use the environment's key provider by default
+        const apiKey = ""; 
 
-        // --- START THE APP ---
-        loadState();
-        setupEventListeners();
-    });
+        document.addEventListener('DOMContentLoaded', async () => {
+            
+            // Wait for Auth before setting up DB listeners
+            await initAuth();
+
+            // Listen for auth state changes to initialize/update database reference
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    console.log("User authenticated:", user.uid);
+                    
+                    // IMPORTANT: Use the restricted path structure to avoid Permission Denied errors
+                    // Path format: artifacts/{appId}/public/data/{collectionName}/{docId}
+                    docRef = doc(db, 'artifacts', appId, 'public', 'data', 'marketing_dashboard', 'main');
+                    
+                    // Initialize the real-time listener now that we have a valid docRef
+                    initRealtimeListener();
+                } else {
+                    console.log("User signed out");
+                }
+            });
+
+            // --- SAVE FUNCTION ---
+            const saveState = async () => {
+                if (!docRef) return; // Don't save if not authenticated
+
+                // Gather Data
+                const servicePages = [];
+                document.querySelectorAll('#service-pages-table-body tr').forEach(row => {
+                    const city = row.cells[0].textContent;
+                    servicePages.push({ city });
+                });
+
+                const blogPosts = [];
+                document.querySelectorAll('#blog-post-list .task-item').forEach(item => {
+                    const title = item.querySelector('a').textContent;
+                    const checked = item.querySelector('input').checked;
+                    blogPosts.push({ title, checked });
+                });
+
+                const checkboxStates = {};
+                document.querySelectorAll('.task-checkbox').forEach(box => {
+                    if(box.id) checkboxStates[box.id] = box.checked;
+                });
+
+                const adGroupStatuses = {};
+                document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
+                    const adGroupName = select.closest('tr').cells[0].textContent;
+                    adGroupStatuses[adGroupName] = select.value;
+                });
+
+                try {
+                    await setDoc(docRef, {
+                        servicePages,
+                        blogPosts,
+                        checkboxStates,
+                        adGroupStatuses,
+                        lastUpdated: new Date()
+                    });
+                    console.log("Saved to Firebase");
+                } catch (e) {
+                    console.error("Error saving to database: ", e);
+                }
+            };
+
+            // --- LOAD FUNCTION ---
+            const initRealtimeListener = () => {
+                if (!docRef) return;
+
+                onSnapshot(docRef, (docSnapshot) => {
+                    if (docSnapshot.exists()) {
+                        const data = docSnapshot.data();
+                        
+                        // Render Service Pages
+                        const tableBody = document.getElementById('service-pages-table-body');
+                        tableBody.innerHTML = '';
+                        if(data.servicePages) {
+                            data.servicePages.forEach(page => {
+                                const newRow = document.createElement('tr');
+                                newRow.classList.add('hover:bg-gray-50');
+                                const slug = page.city.toLowerCase().replace(/\s+/g, '-');
+                                const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
+                                newRow.innerHTML = `<td class="p-3 border-b">${page.city}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
+                                tableBody.appendChild(newRow);
+                            });
+                        }
+
+                        // Render Blog Posts
+                        const blogList = document.getElementById('blog-post-list');
+                        blogList.innerHTML = '';
+                        if(data.blogPosts) {
+                            data.blogPosts.forEach(post => {
+                                const newItem = document.createElement('div');
+                                newItem.classList.add('task-item', 'flex', 'items-center');
+                                const safeTitle = post.title.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+                                const newId = 'task-blog-' + safeTitle;
+                                newItem.innerHTML = `<input id="${newId}" type="checkbox" class="h-4 w-4 rounded task-checkbox" ${post.checked ? 'checked' : ''}><label class="ml-3 text-gray-700"><a href="#" class="hover:underline text-blue-600">${post.title}</a></label>`;
+                                blogList.appendChild(newItem);
+                            });
+                            document.querySelectorAll('#blog-post-list .task-checkbox').forEach(el => el.addEventListener('change', saveState));
+                        }
+
+                        // Render Checkboxes
+                        if(data.checkboxStates) {
+                            for (const id in data.checkboxStates) {
+                                const checkbox = document.getElementById(id);
+                                if (checkbox) checkbox.checked = data.checkboxStates[id];
+                            }
+                        }
+
+                        // Render Ad Groups
+                        if(data.adGroupStatuses) {
+                            document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
+                                const adGroupName = select.closest('tr').cells[0].textContent;
+                                if (data.adGroupStatuses[adGroupName]) {
+                                    select.value = data.adGroupStatuses[adGroupName];
+                                }
+                                updateSelectAppearance(select);
+                            });
+                        }
+                    } else {
+                        console.log("Database document created (waiting for input)");
+                    }
+                }, (error) => {
+                    console.error("Error listening to database:", error);
+                });
+            };
+
+            const updateSelectAppearance = (selectElement) => {
+                selectElement.classList.remove('status-active', 'status-paused');
+                selectElement.classList.add(selectElement.value === 'active' ? 'status-active' : 'status-paused');
+            };
+
+            // --- SETUP LISTENERS ---
+            function setupEventListeners() {
+                document.getElementById('add-city-btn').addEventListener('click', () => {
+                    const cityNameInput = document.getElementById('new-city-name');
+                    if (cityNameInput.value.trim()) {
+                        const tableBody = document.getElementById('service-pages-table-body');
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `<td class="p-3 border-b">${cityNameInput.value.trim()}</td><td>...</td><td>...</td>`;
+                        tableBody.appendChild(newRow);
+                        saveState();
+                        cityNameInput.value = '';
+                    }
+                });
+
+                document.getElementById('add-blog-btn').addEventListener('click', () => {
+                    const blogPostInput = document.getElementById('new-blog-post');
+                    if (blogPostInput.value.trim()) {
+                        const blogList = document.getElementById('blog-post-list');
+                        const newItem = document.createElement('div');
+                        newItem.classList.add('task-item');
+                        newItem.innerHTML = `<input type="checkbox"><label><a>${blogPostInput.value.trim()}</a></label>`;
+                        blogList.appendChild(newItem);
+                        saveState();
+                        blogPostInput.value = '';
+                    }
+                });
+
+                document.body.addEventListener('change', (e) => {
+                    if(e.target.classList.contains('task-checkbox')) {
+                        saveState();
+                    }
+                    if(e.target.classList.contains('status-select')) {
+                        updateSelectAppearance(e.target);
+                        saveState();
+                    }
+                });
+            }
+
+            // --- AI CHAT LOGIC ---
+            const chatHistory = document.getElementById('chat-history');
+            const chatInput = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+
+            const handleSend = async () => {
+                const userPrompt = chatInput.value.trim();
+                if (!userPrompt) return;
+
+                const userMsgDiv = document.createElement('div');
+                userMsgDiv.className = 'user-msg p-3 rounded-lg mb-2';
+                userMsgDiv.innerHTML = `<p class="font-semibold text-sky-800">You</p><p class="text-gray-700">${userPrompt}</p>`;
+                chatHistory.appendChild(userMsgDiv);
+                chatInput.value = '';
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'ai-msg p-3 rounded-lg mb-2 flex items-center space-x-2';
+                loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant</p><div class="loading-dots flex space-x-1"><div class="w-2 h-2 bg-gray-500 rounded-full"></div><div class="w-2 h-2 bg-gray-500 rounded-full"></div><div class="w-2 h-2 bg-gray-500 rounded-full"></div></div>`;
+                chatHistory.appendChild(loadingDiv);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+                
+                try {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                    const systemPrompt = "You are a world-class marketing assistant for Mechanical Temp. Keep it brief and helpful.";
+                    const payload = {
+                        contents: [{ parts: [{ text: userPrompt }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) throw new Error(`API error: ${response.status}`);
+
+                    const result = await response.json();
+                    const aiText = result.candidates[0].content.parts[0].text;
+                    loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant</p><div class="text-gray-700">${aiText}</div>`;
+                } catch (error) {
+                    console.error('Error:', error);
+                    loadingDiv.innerHTML = `<p class="font-semibold text-red-800">Error</p><p class="text-red-700">Could not connect to AI.</p>`;
+                }
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            };
+
+            sendBtn.addEventListener('click', handleSend);
+            chatInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') handleSend();
+            });
+
+            setupEventListeners();
+        });
     </script>
 </body>
 </html>
-
