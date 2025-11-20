@@ -73,10 +73,6 @@
         </div>
 
         <header class="dashboard-header p-6 rounded-t-lg flex flex-col md:flex-row justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold">Mechanical Temp</h1>
-                <p class="text-lg text-gray-300">Central Marketing Dashboard</p>
-            </div>
             <div class="flex flex-wrap justify-center gap-2 mt-4 md:mt-0">
                 <a href="./lead-funnel.html" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg transition">View Lead Funnel Guide</a>
                 <a href="./Weekly-Cross-Promotion-Planner.html" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg transition">Weekly Content Planner</a>
@@ -323,8 +319,7 @@
         };
 
         // --- Gemini AI Key ---
-        // Restored key from original request
-        const GEMINI_API_KEY = "AIzaSyCA_ZrK5xTCKD5OqL-HaLtRDFBK99GCjtI"; 
+        const apiKey = ""; 
 
         document.addEventListener('DOMContentLoaded', async () => {
             
@@ -337,9 +332,9 @@
                     console.log("User authenticated:", user.uid);
                     document.getElementById('auth-error').style.display = 'none';
                     
-                    // IMPORTANT: Use the restricted path structure to avoid Permission Denied errors
-                    // Path format: artifacts/{appId}/public/data/{collectionName}/{docId}
-                    docRef = doc(db, 'artifacts', appId, 'public', 'data', 'marketing_dashboard', 'main');
+                    // IMPORTANT: We use the USER specific path to allow writes
+                    // Path format: artifacts/{appId}/users/{userId}/marketing_dashboard/main
+                    docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'marketing_dashboard', 'main');
                     
                     // Initialize the real-time listener now that we have a valid docRef
                     initRealtimeListener();
@@ -520,14 +515,31 @@
                 chatHistory.scrollTop = chatHistory.scrollHeight;
                 
                 try {
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`;
+                    // Exponential backoff implementation for API retries
+                    const fetchWithRetry = async (url, options, retries = 5, delay = 1000) => {
+                        try {
+                            const response = await fetch(url, options);
+                            if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
+                                throw new Error(`Retryable error: ${response.status}`);
+                            }
+                            return response;
+                        } catch (error) {
+                            if (retries > 0) {
+                                await new Promise(resolve => setTimeout(resolve, delay));
+                                return fetchWithRetry(url, options, retries - 1, delay * 2);
+                            }
+                            throw error;
+                        }
+                    };
+
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
                     const systemPrompt = "You are a world-class marketing assistant for Mechanical Temp. Keep it brief and helpful.";
                     const payload = {
                         contents: [{ parts: [{ text: userPrompt }] }],
                         systemInstruction: { parts: [{ text: systemPrompt }] },
                     };
 
-                    const response = await fetch(apiUrl, {
+                    const response = await fetchWithRetry(apiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
@@ -540,7 +552,9 @@
                     loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant</p><div class="text-gray-700">${aiText}</div>`;
                 } catch (error) {
                     console.error('Error:', error);
-                    loadingDiv.innerHTML = `<p class="font-semibold text-red-800">Error</p><p class="text-red-700">Could not connect to AI. Check API Key.</p>`;
+                    // Provide instruction if key is missing or invalid
+                    const errorMsg = apiKey ? "Could not connect to AI. Check console." : "Missing API Key. Please add your Gemini API key to the code.";
+                    loadingDiv.innerHTML = `<p class="font-semibold text-red-800">Error</p><p class="text-red-700">${errorMsg}</p>`;
                 }
                 chatHistory.scrollTop = chatHistory.scrollHeight;
             };
