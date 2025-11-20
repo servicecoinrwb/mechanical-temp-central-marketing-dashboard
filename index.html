@@ -120,7 +120,12 @@
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr><th class="p-3 border-b">City</th><th class="p-3 border-b">URL</th><th class="p-3 border-b">Status</th></tr>
+                                    <tr>
+                                        <th class="p-3 border-b">City</th>
+                                        <th class="p-3 border-b">URL</th>
+                                        <th class="p-3 border-b">Status</th>
+                                        <th class="p-3 border-b text-center">Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody id="service-pages-table-body">
                                     <!-- Cities loaded from Firebase -->
@@ -433,8 +438,16 @@
                                 const newRow = document.createElement('tr');
                                 newRow.classList.add('hover:bg-gray-50');
                                 const slug = page.city.toLowerCase().replace(/\s+/g, '-');
-                                const newUrl = `https://www.mechanicaltemp.com/service-areas/${slug}`;
-                                newRow.innerHTML = `<td class="p-3 border-b">${page.city}</td><td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}</a></td><td class="p-3 border-b"><span class="status-live">✅ Live</span></td>`;
+                                // Update URL format here
+                                const newUrl = `https://mechanicaltemp.com/${slug}.html`;
+                                newRow.innerHTML = `
+                                    <td class="p-3 border-b">${page.city}</td>
+                                    <td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}.html</a></td>
+                                    <td class="p-3 border-b"><span class="status-live">✅ Live</span></td>
+                                    <td class="p-3 border-b text-center">
+                                        <button class="delete-city-btn text-red-500 hover:text-red-700 font-bold px-2" title="Delete">✕</button>
+                                    </td>
+                                `;
                                 tableBody.appendChild(newRow);
                             });
                         }
@@ -494,7 +507,7 @@
                     if (cityNameInput.value.trim()) {
                         const tableBody = document.getElementById('service-pages-table-body');
                         const newRow = document.createElement('tr');
-                        newRow.innerHTML = `<td class="p-3 border-b">${cityNameInput.value.trim()}</td><td>...</td><td>...</td>`;
+                        newRow.innerHTML = `<td class="p-3 border-b">${cityNameInput.value.trim()}</td><td>...</td><td>...</td><td>...</td>`;
                         tableBody.appendChild(newRow);
                         saveState();
                         cityNameInput.value = '';
@@ -520,6 +533,15 @@
                     }
                     if(e.target.classList.contains('status-select')) {
                         updateSelectAppearance(e.target);
+                        saveState();
+                    }
+                });
+
+                // Handle Delete Button Click
+                document.body.addEventListener('click', (e) => {
+                    if (e.target.closest('.delete-city-btn')) {
+                        const row = e.target.closest('tr');
+                        row.remove();
                         saveState();
                     }
                 });
