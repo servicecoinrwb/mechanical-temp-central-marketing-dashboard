@@ -99,11 +99,21 @@
                 </div>
 
                 <div class="flex flex-wrap justify-end gap-2">
-                    <a href="./lead-funnel.html" class="bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold py-2 px-3 rounded transition">Lead Funnel</a>
-                    <a href="./Weekly-Cross-Promotion-Planner.html" class="bg-teal-500 hover:bg-teal-600 text-white text-xs font-semibold py-2 px-3 rounded transition">Planner</a>
-                    <a href="https://servicecoinrwb.github.io/Blog-Post-Generator/" target="_blank" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold py-2 px-3 rounded transition">Blog Gen</a>
-                    <a href="Marketing-Expense-Tracker.html" target="_blank" class="bg-slate-500 hover:bg-slate-600 text-white text-xs font-semibold py-2 px-3 rounded transition">Expense</a>
+                    <a href="./lead-funnel.html" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Lead Funnel</a>
+                    <a href="./Weekly-Cross-Promotion-Planner.html" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Planner</a>
+                    <a href="https://servicecoinrwb.github.io/Blog-Post-Generator/" target="_blank" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Blog Gen</a>
+                    <a href="Marketing-Expense-Tracker.html" target="_blank" class="bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Expense</a>
+                    <a href="https://publish.buffer.com/channels/68d52c4864332ee3985b5f47" target="_blank" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Buffer</a>
+                    <a href="https://www.facebook.com/mechanicaltemp/?_rdr" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Facebook</a>
+                    <a href="https://business.facebook.com/latest/home?business_id=537436768160092&asset_id=227491970734407" target="_blank" class="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Meta Business</a>
+                    <a href="https://github.com/servicecoinrwb/Mechanical-Temp-Website" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Website Admin</a>
+                    <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amechanicaltemp.com" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Search Console</a>
+                    <a href="https://www.google.com/search?q=mechanical+temp" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Business Profile</a>
+                    <a href="https://analytics.google.com/analytics/web/#/a370538021p507640648/reports/intelligenthome?params=_u..nav%3Dmaui" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Analytics</a>
+                    <a href="https://ads.google.com/aw/campaigns" target="_blank" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Google Ads</a>
                 </div>
+            </div>
+        </header>
             </div>
         </header>
 
@@ -563,30 +573,48 @@
                         }
                     };
 
-                    // Use Standard Gemini 1.5 Flash Model
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-                    const systemPrompt = "You are a world-class marketing assistant for Mechanical Temp. Keep it brief and helpful.";
-                    const payload = {
-                        contents: [{ parts: [{ text: userPrompt }] }],
-                        systemInstruction: { parts: [{ text: systemPrompt }] },
-                    };
+                    // Attempt Primary Model, Fallback to Pro if it fails
+                    const models = ['gemini-1.5-flash-latest', 'gemini-1.5-flash', 'gemini-pro'];
+                    let response = null;
+                    let usedModel = '';
 
-                    const response = await fetchWithRetry(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
+                    for (const model of models) {
+                        try {
+                            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                            const payload = {
+                                contents: [{ parts: [{ text: userPrompt }] }],
+                                systemInstruction: { parts: [{ text: "You are a helpful marketing assistant." }] }
+                            };
+                            
+                            // Note: gemini-pro might not support systemInstruction in some versions, 
+                            // but let's try consistent payload first.
+                            
+                            const res = await fetchWithRetry(apiUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            }, 1); // Quick retry locally, rely on loop for model fallback
+                            
+                            if (res.ok) {
+                                response = res;
+                                usedModel = model;
+                                break;
+                            }
+                        } catch (e) {
+                            console.warn(`Model ${model} failed, trying next...`);
+                        }
+                    }
 
-                    if (!response.ok) throw new Error(`API error: ${response.status}`);
+                    if (!response || !response.ok) throw new Error(`All models failed. Last status: ${response ? response.status : 'Network Error'}`);
 
                     const result = await response.json();
                     const aiText = result.candidates[0].content.parts[0].text;
-                    loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant</p><div class="text-gray-700">${aiText}</div>`;
+                    loadingDiv.innerHTML = `<p class="font-semibold text-gray-800">AI Assistant (${usedModel})</p><div class="text-gray-700">${aiText}</div>`;
                 } catch (error) {
                     console.error('Error:', error);
                     let errorMsg = "Could not connect to AI.";
                     if (apiKey.includes("PASTE_YOUR")) errorMsg = "Missing API Key. Please edit the HTML and paste your key.";
-                    else if (error.message.includes("400")) errorMsg = "Bad Request. Your API key might be invalid.";
+                    else if (error.message.includes("404")) errorMsg = "Models not found. Ensure API is enabled in Google Cloud.";
                     
                     loadingDiv.innerHTML = `<p class="font-semibold text-red-800">Error</p><p class="text-red-700">${errorMsg}</p>`;
                 }
