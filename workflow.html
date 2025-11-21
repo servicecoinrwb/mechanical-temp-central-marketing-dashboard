@@ -196,7 +196,20 @@
         // --- FIREBASE AUTH & DB LISTENERS ---
 
         function setupAuthListener() {
-            // Check auth status immediately and listen for changes (after sign-in)
+            // 1. Check for sign-in result immediately after page load (for redirect method)
+            auth.getRedirectResult()
+                .then((result) => {
+                    if (result.user) {
+                        // User signed in successfully via redirect. The listener below will handle UI updates.
+                        console.log("Redirect sign-in successful.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error getting redirect result:", error.message);
+                });
+
+
+            // 2. Set up the ongoing authentication state listener (Handles both initial sign-in AND persistence)
             auth.onAuthStateChanged((user) => {
                 const signInBtn = document.getElementById('google-signin-btn');
                 const container = document.getElementById('grid-container');
@@ -226,6 +239,7 @@
                     
                     // Show sign-in prompt
                     container.innerHTML = '<p id="loading-text" class="text-center text-gray-500 col-span-full">Please sign in with Google to view your workflow.</p>';
+                    updateProgress(); // Ensure progress bar resets
                 }
             });
         }
