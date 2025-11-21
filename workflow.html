@@ -103,9 +103,19 @@
         import { getFirestore, doc, onSnapshot, setDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Configuration ---
-        // Use environment variables for secure config
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app';
+        // Hardcoded configuration for standalone use
+        const firebaseConfig = {
+            apiKey: "AIzaSyAd3taUTwf9AJv6M7RMvCWKlgw_pdqrRpM",
+            authDomain: "marketing.mechanicaltemp.com",
+            projectId: "weekly-workflow-478915",
+            storageBucket: "weekly-workflow-478915.firebasestorage.app",
+            messagingSenderId: "1035427962286",
+            appId: "1:1035427962286:web:2e23291d8926bed94f3c3f",
+            measurementId: "G-8SRKJDSDX3"
+        };
+        
+        // Use the Project ID as the App ID for data storage consistency
+        const appId = "weekly-workflow-478915";
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -131,7 +141,7 @@
         // --- Authentication Logic ---
         const initAuth = async () => {
             try {
-                // Prioritize custom token from environment, fallback to anonymous
+                // Try custom token if available (immersive env), otherwise anon (standalone)
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
