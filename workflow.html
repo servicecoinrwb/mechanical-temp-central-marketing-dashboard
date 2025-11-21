@@ -185,7 +185,6 @@
         let currentDayIndexForAdd = null;
         let currentUserId = null; 
         const DB_COLLECTION = "workflows"; 
-        // Using a single document ID so all signed-in users share the same workflow list.
         const DB_DOCUMENT = "master_workflow_data"; 
 
         // Init
@@ -225,7 +224,7 @@
                     signInBtn.classList.add('bg-red-600', 'hover:bg-red-700');
                     signInBtn.disabled = false;
                     
-                    // Clear the grid and show sign-in prompt
+                    // Show sign-in prompt
                     container.innerHTML = '<p id="loading-text" class="text-center text-gray-500 col-span-full">Please sign in with Google to view your workflow.</p>';
                 }
             });
@@ -233,10 +232,11 @@
 
         function signInWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            // Use signInWithPopup for a new window sign-in flow
-            auth.signInWithPopup(provider)
+            
+            // FIX: Using signInWithRedirect to avoid pop-up blockers and session issues
+            auth.signInWithRedirect(provider)
                 .catch((error) => {
-                    console.error("Google Sign-in failed:", error.message);
+                    console.error("Google Sign-in failed (Redirect):", error.message);
                     alert("Sign-in failed: " + error.message);
                 });
         }
