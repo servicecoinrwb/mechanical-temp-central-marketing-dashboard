@@ -45,9 +45,15 @@
                 </div>
                 
                 <div class="flex items-center gap-3">
-                    <!-- Auth Status Indicator -->
-                    <div id="auth-status" class="text-xs font-mono bg-gray-100 text-gray-500 px-2 py-1 rounded hidden md:block">
-                        Connecting...
+                    <!-- Auth Buttons -->
+                    <button id="google-signin-btn" class="hidden px-4 py-2 rounded-lg text-sm font-medium bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm transition-colors flex items-center gap-2">
+                        <i class="fa-brands fa-google text-red-500"></i> Sign In
+                    </button>
+                    
+                    <div id="user-profile" class="hidden items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-lg">
+                        <div class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold" id="user-avatar">U</div>
+                        <span class="text-xs font-medium text-gray-600" id="user-email">user@email.com</span>
+                        <button id="signout-btn" class="text-xs text-red-500 hover:text-red-700 ml-2 font-semibold">Sign Out</button>
                     </div>
 
                     <button id="edit-btn" class="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 hover:bg-gray-50 text-gray-700 transition-colors flex items-center gap-2" disabled>
@@ -100,7 +106,7 @@
     <script type="module">
         // Using CDN imports compatible with standalone HTML files
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Configuration ---
@@ -121,6 +127,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
 
         // --- State Management ---
         let workflowData = [];
@@ -139,46 +146,65 @@
             { day: "Friday", color: "purple", subtext: "Payroll & Wrap-up", tasks: [{ text: "Process Payroll", done: false }, { text: "Check Marketing Management", done: false }, { text: "Nextdoor post", done: false }, { text: "Release blog post & update page", done: false }, { text: "Balance bookkeeping", done: false }] }
         ];
 
-        // --- Authentication Logic ---
-        const initAuth = async () => {
-            try {
-                // Try custom token if available (immersive env), otherwise anon (standalone)
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth failed:", error);
-                document.getElementById('loading-text').textContent = "Authentication failed. Please refresh.";
-            }
-        };
+        // --- Authentication UI Logic ---
+        const signInBtn = document.getElementById('google-signin-btn');
+        const userProfile = document.getElementById('user-profile');
+        const userEmailSpan = document.getElementById('user-email');
+        const userAvatar = document.getElementById('user-avatar');
+        const signOutBtn = document.getElementById('signout-btn');
 
-        // Start Auth
-        initAuth();
+        // Handle Google Sign In
+        signInBtn.addEventListener('click', async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+            } catch (error) {
+                console.error("Error signing in:", error);
+                alert("Sign in failed. Check console.");
+            }
+        });
+
+        // Handle Sign Out
+        signOutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                // On signout, we might want to signInAnonymously again to keep app usable
+                // or just let the auth state listener handle it (it will go to null, then we can trigger anon)
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error("Error signing out:", error);
+            }
+        });
 
         // Listen for Auth State
         onAuthStateChanged(auth, (user) => {
             const editBtn = document.getElementById('edit-btn');
             const resetBtn = document.getElementById('reset-btn');
-            const authStatus = document.getElementById('auth-status');
 
             if (user) {
                 currentUserId = user.uid;
-                authStatus.textContent = `Secure: ${user.uid.substring(0,6)}...`;
-                authStatus.classList.add('text-green-600', 'bg-green-50');
                 
+                // Update UI based on whether user is Anonymous or Google
+                if (user.isAnonymous) {
+                    // Show Sign In Button, Hide Profile
+                    signInBtn.classList.remove('hidden');
+                    userProfile.classList.add('hidden');
+                } else {
+                    // Hide Sign In Button, Show Profile
+                    signInBtn.classList.add('hidden');
+                    userProfile.classList.remove('hidden');
+                    userProfile.classList.add('flex');
+                    userEmailSpan.textContent = user.email || "User";
+                    userAvatar.textContent = (user.email || "U")[0].toUpperCase();
+                }
+
                 editBtn.disabled = false;
                 resetBtn.disabled = false;
                 
                 // Load data immediately after auth
                 setupDataListener(user.uid);
             } else {
-                currentUserId = null;
-                authStatus.textContent = "Disconnected";
-                editBtn.disabled = true;
-                resetBtn.disabled = true;
-                if (unsubscribeData) unsubscribeData();
+                // If no user at all, try anonymous login to at least show the app
+                signInAnonymously(auth).catch(console.error);
             }
         });
 
@@ -186,7 +212,11 @@
         function setupDataListener(userId) {
             if (!userId) return;
 
-            // Correct Path: artifacts/{appId}/users/{userId}/data/workflow
+            // Stop listening to previous user's data if any
+            if (unsubscribeData) {
+                unsubscribeData();
+            }
+
             const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'workflow');
 
             unsubscribeData = onSnapshot(docRef, (docSnap) => {
@@ -197,9 +227,9 @@
                     const data = docSnap.data();
                     workflowData = data.items || defaultData;
                 } else {
-                    // First time user: set defaults
                     workflowData = defaultData;
-                    saveData(); 
+                    // Optional: Don't auto-save immediately on read-miss to avoid cluttering DB with anon users
+                    // But helpful for UX
                 }
                 render();
             }, (error) => {
@@ -223,12 +253,11 @@
 
         // --- UI Logic ---
         
-        // Make functions available globally for onclick attributes
         window.toggleTask = (dayIndex, taskIndex) => {
             if (isEditMode) return;
             workflowData[dayIndex].tasks[taskIndex].done = !workflowData[dayIndex].tasks[taskIndex].done;
-            saveData(); // Saves to Firestore, listener will update UI via render() (optimistic update handled by logic flow)
-            render();   // Immediate feedback
+            saveData(); 
+            render();   
         };
 
         window.deleteTask = (dayIndex, taskIndex) => {
@@ -338,10 +367,7 @@
         function render() {
             const container = document.getElementById('grid-container');
             
-            // Prevent rendering if data isn't ready or empty
             if (!workflowData || workflowData.length === 0) {
-                // If authenticated but no data yet (latency), wait.
-                // The snapshot listener handles the empty case by setting defaults.
                 return; 
             } 
             
