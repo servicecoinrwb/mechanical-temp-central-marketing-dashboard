@@ -7,6 +7,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-google-provider-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -54,7 +55,10 @@
                     <button onclick="resetWeek()" class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors flex items-center gap-2">
                         <i class="fa-solid fa-rotate-right"></i> Start New Week
                     </button>
-                </div>
+                    <button onclick="signInWithGoogle()" id="google-signin-btn" class="px-4 py-2 rounded-lg text-sm font-medium bg-red-600 hover:bg-red-700 text-white shadow-sm transition-colors flex items-center gap-2">
+                        <i class="fa-brands fa-google"></i> Sign In
+                    </button>
+                    </div>
             </div>
             
             <div class="mt-4 w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
@@ -69,7 +73,7 @@
 
     <main class="flex-grow p-4 sm:p-6 lg:p-8">
         <div id="grid-container" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <p id="loading-text" class="text-center text-gray-500 col-span-full">Connecting to Firebase...</p>
+            <p id="loading-text" class="text-center text-gray-500 col-span-full">Please sign in with Google to view your workflow.</p>
         </div>
     </main>
 
@@ -181,37 +185,65 @@
         let currentDayIndexForAdd = null;
         let currentUserId = null; 
         const DB_COLLECTION = "workflows"; 
+        // Using a single document ID so all signed-in users share the same workflow list.
         const DB_DOCUMENT = "master_workflow_data"; 
 
         // Init
         document.addEventListener('DOMContentLoaded', () => {
-            // Start the authentication and data loading process
-            signInUser();
+            setupAuthListener(); 
             updateDate();
         });
 
         // --- FIREBASE AUTH & DB LISTENERS ---
 
-        function signInUser() {
-            // Use the globally available auth object
-            auth.signInAnonymously()
-                .then(() => {
-                    auth.onAuthStateChanged((user) => {
-                        if (user) {
-                            currentUserId = user.uid;
-                            listenToWorkflowData();
-                        } else {
-                            document.getElementById('loading-text').textContent = 'Error: Authentication failed.';
-                        }
-                    });
-                })
+        function setupAuthListener() {
+            // Check auth status immediately and listen for changes (after sign-in)
+            auth.onAuthStateChanged((user) => {
+                const signInBtn = document.getElementById('google-signin-btn');
+                const container = document.getElementById('grid-container');
+
+                if (user) {
+                    // User is signed in.
+                    currentUserId = user.uid;
+                    signInBtn.innerHTML = `<i class="fa-brands fa-google"></i> Signed In`;
+                    signInBtn.classList.add('bg-gray-400');
+                    signInBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    signInBtn.disabled = true;
+                    
+                    // Show loading text while fetching data
+                    container.innerHTML = '<p id="loading-text" class="text-center text-gray-500 col-span-full">Fetching workflow data...</p>';
+
+                    listenToWorkflowData();
+                } else {
+                    // User is signed out.
+                    currentUserId = null;
+                    workflowData = []; // Clear data on sign out
+                    render(); 
+                    
+                    signInBtn.innerHTML = `<i class="fa-brands fa-google"></i> Sign In`;
+                    signInBtn.classList.remove('bg-gray-400');
+                    signInBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+                    signInBtn.disabled = false;
+                    
+                    // Clear the grid and show sign-in prompt
+                    container.innerHTML = '<p id="loading-text" class="text-center text-gray-500 col-span-full">Please sign in with Google to view your workflow.</p>';
+                }
+            });
+        }
+
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            // Use signInWithPopup for a new window sign-in flow
+            auth.signInWithPopup(provider)
                 .catch((error) => {
-                    console.error("Anonymous sign-in failed:", error.message);
-                    document.getElementById('loading-text').textContent = 'Error: Could not connect to database. Check Firebase configuration and rules.';
+                    console.error("Google Sign-in failed:", error.message);
+                    alert("Sign-in failed: " + error.message);
                 });
         }
 
         function listenToWorkflowData() {
+            if (!currentUserId) return;
+
             // Reference to the master document
             const docRef = db.collection(DB_COLLECTION).doc(DB_DOCUMENT);
 
@@ -328,6 +360,10 @@
         }
 
         function toggleEditMode() {
+            if (!currentUserId) {
+                alert("Please sign in with Google to edit the tasks.");
+                return;
+            }
             isEditMode = !isEditMode;
             const body = document.body;
             const btnText = document.getElementById('edit-text');
@@ -348,6 +384,10 @@
         }
 
         function resetWeek() {
+            if (!currentUserId) {
+                alert("Please sign in with Google to reset the week.");
+                return;
+            }
             if(confirm("Are you sure you want to start a new week? This will uncheck all tasks and update the shared database.")) {
                 workflowData.forEach(day => {
                     day.tasks.forEach(task => {
