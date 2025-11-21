@@ -3,115 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Business Workflow</title>
+    <title>Mechanical Temp - Marketing Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <!-- Fix Favicon 404 -->
+    <link rel="icon" href="data:,">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .checkbox-wrapper input:checked + div {
-            background-color: #10b981;
-            border-color: #10b981;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
         }
-        .checkbox-wrapper input:checked + div svg {
-            display: block;
+        .dashboard-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid #e5e7eb;
         }
-        .task-text { transition: all 0.2s; }
-        .task-done .task-text {
-            text-decoration: line-through;
-            color: #9ca3af;
+        .dashboard-header {
+            background-color: #1A2D4E;
+            color: white;
         }
-        /* Edit mode styles */
-        .delete-btn { display: none; }
-        .edit-mode .delete-btn { display: block; }
-        .edit-mode .checkbox-wrapper { display: none; }
-        .edit-mode .drag-handle { display: block; cursor: move; }
-        .add-btn { display: none; }
-        .edit-mode .add-btn { display: flex; }
+        .status-live, .status-select {
+            padding: 2px 10px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        .status-live { background-color: #dcfce7; color: #166534; }
         
-        /* Smooth fade for progress bar */
-        .progress-bar { transition: width 0.5s ease-in-out; }
+        .status-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+        }
+        .status-select.status-active { background-color: #dcfce7; color: #166534; }
+        .status-select.status-paused { background-color: #fee2e2; color: #991b1b; }
+
+        .task-item:has(input:checked) label, .task-item:has(input:checked) a {
+            text-decoration: line-through;
+            color: #6b7280;
+        }
+        th {
+            background-color: #f9fafb;
+        }
+        
+        /* Error Banner */
+        #auth-error { display: none; }
+        
+        /* Auth UI */
+        #user-display { display: none; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col text-gray-800">
+<body class="p-4 md:p-8">
 
-    <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Weekly Workflow</h1>
-                    <p class="text-sm text-gray-500" id="date-display">Current Week</p>
-                </div>
-                
-                <div class="flex items-center gap-3">
-                    <!-- Auth Buttons -->
-                    <button id="google-signin-btn" class="hidden px-4 py-2 rounded-lg text-sm font-medium bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm transition-colors flex items-center gap-2">
-                        <i class="fa-brands fa-google text-red-500"></i> Sign In
-                    </button>
-                    
-                    <div id="user-profile" class="hidden items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-lg">
-                        <div class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold" id="user-avatar">U</div>
-                        <span class="text-xs font-medium text-gray-600" id="user-email">user@email.com</span>
-                        <button id="signout-btn" class="text-xs text-red-500 hover:text-red-700 ml-2 font-semibold">Sign Out</button>
-                    </div>
+    <div class="max-w-7xl mx-auto">
+        <!-- Auth Error Banner -->
+        <div id="auth-error" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+            <!-- Error message injected here -->
+        </div>
 
-                    <button id="edit-btn" class="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 hover:bg-gray-50 text-gray-700 transition-colors flex items-center gap-2" disabled>
-                        <i class="fa-solid fa-pen-to-square"></i> <span id="edit-text">Edit Tasks</span>
-                    </button>
-                    <button id="reset-btn" class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors flex items-center gap-2" disabled>
-                        <i class="fa-solid fa-rotate-right"></i> Start New Week
-                    </button>
-                </div>
+        <header class="dashboard-header p-6 rounded-t-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-bold">Mechanical Temp</h1>
+                <p class="text-lg text-gray-300">Central Marketing Dashboard</p>
             </div>
             
-            <!-- Progress Bar -->
-            <div class="mt-4 w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                <div id="progress-fill" class="bg-green-500 h-2.5 rounded-full progress-bar" style="width: 0%"></div>
+            <div class="flex flex-col items-end gap-4 w-full md:w-auto">
+                <!-- Authentication UI -->
+                <div id="auth-container" class="bg-white/10 p-2 rounded-lg backdrop-blur-sm border border-white/20 self-end">
+                    <button id="btn-google-login" class="flex items-center gap-2 bg-white text-gray-800 px-4 py-2 rounded hover:bg-gray-100 transition font-medium text-sm">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" /><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" /><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" /><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" /></svg>
+                        Sign in with Google
+                    </button>
+                    <div id="user-display" class="flex items-center gap-3">
+                        <img id="user-photo" src="" alt="User" class="w-8 h-8 rounded-full border-2 border-white/50">
+                        <div class="text-sm">
+                            <p id="user-name" class="font-semibold">User</p>
+                            <button id="btn-logout" class="text-xs text-sky-300 hover:text-white underline">Sign Out</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-end gap-2">
+                    <a href="./lead-funnel.html" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Lead Funnel</a>
+                    <a href="./Weekly-Cross-Promotion-Planner.html" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Planner</a>
+                    <a href="https://servicecoinrwb.github.io/Blog-Post-Generator/" target="_blank" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Blog Gen</a>
+                    <a href="https://bookkeeper.mechanicaltemp.com/" target="_blank" class="bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Bookkeeper</a>
+                    <a href="https://publish.buffer.com/channels/68d52c4864332ee3985b5f47" target="_blank" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Buffer</a>
+                    <a href="https://www.facebook.com/mechanicaltemp/?_rdr" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Facebook</a>
+                    <a href="https://x.com/MechanicalTemp" target="_blank" class="bg-black hover:bg-gray-800 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">X (Twitter)</a>
+                    <a href="https://www.linkedin.com/company/mechanical-temp/?viewAsMember=true" target="_blank" class="bg-blue-800 hover:bg-blue-900 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">LinkedIn</a>
+                    <a href="https://nextdoor.com/page-admin/dashboard/" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Nextdoor</a>
+                    <a href="https://studio.youtube.com/channel/UCpSjt6cy6b970nOFZv1rp_w" target="_blank" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">YouTube Studio</a>
+                    <a href="https://business.facebook.com/latest/home?business_id=537436768160092&asset_id=227491970734407" target="_blank" class="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Meta Business</a>
+                    <a href="https://github.com/servicecoinrwb/Mechanical-Temp-Website" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Website Admin</a>
+                    <a href="./workflow.html" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Workflow</a>
+                    <a href="https://ads.google.com/localservices/inbox?cid=1355545793&bid=4132500062&pid=9999999999&euid=5814031823&hl=en&gl=US" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">LSA</a>
+                    <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amechanicaltemp.com" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Search Console</a>
+                    <a href="https://www.google.com/search?q=mechanical+temp" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Business Profile</a>
+                    <a href="https://analytics.google.com/analytics/web/#/a370538021p507640648/reports/intelligenthome?params=_u..nav%3Dmaui" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Analytics</a>
+                    <a href="https://ads.google.com/aw/campaigns" target="_blank" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Google Ads</a>
+                </div>
             </div>
-            <div class="flex justify-between text-xs text-gray-400 mt-1">
-                <span>Progress</span>
-                <span id="progress-text">0%</span>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+            <div class="lg:col-span-2 space-y-8">
+                <div class="dashboard-card">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold mb-4">Pillar 1: On-Page SEO (Organic)</h2>
+                        <h3 class="text-xl font-semibold mb-2">A. Local Service Area Pages</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr>
+                                        <th class="p-3 border-b">City</th>
+                                        <th class="p-3 border-b">URL</th>
+                                        <th class="p-3 border-b">Status</th>
+                                        <th class="p-3 border-b text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="service-pages-table-body">
+                                    <!-- Cities loaded from Firebase -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4 flex space-x-2">
+                            <input type="text" id="new-city-name" placeholder="Enter new city name..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <button id="add-city-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Add City</button>
+                        </div>
+
+                        <h3 class="text-xl font-semibold mt-6 mb-2">B. Content Strategy: Blog / Resource Center</h3>
+                        <div class="space-y-2" id="blog-post-list">
+                             <!-- Blog posts loaded from Firebase -->
+                        </div>
+                         <div class="mt-4 flex space-x-2">
+                            <input type="text" id="new-blog-post" placeholder="Enter new blog post title..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <button id="add-blog-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">Add Post</button>
+                        </div>
+                        <h3 class="text-xl font-semibold mt-6 mb-2">C. Video Content</h3>
+                        <div class="space-y-2">
+                            <div class="task-item flex items-center"><input id="task-video-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-video-1" class="ml-3 text-gray-700">Film short video (e.g., "How to Change Your Furnace Filter")</label></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold mb-4">Pillar 5: Google Ads (Paid Search)</h2>
+                         <h3 class="text-xl font-semibold mb-2">A. Campaign Foundation</h3>
+                        <div class="space-y-2">
+                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-1" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-1" class="ml-3 text-gray-700">High-Converting Landing Page Live</label></div>
+                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-2" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-2" class="ml-3 text-gray-700">Conversion Tracking Installed</label></div>
+                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-3" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-3" class="ml-3 text-gray-700">LSA Campaign Paused to focus budget</label></div>
+                        </div>
+                         <h3 class="text-xl font-semibold mt-6 mb-2">B. Active Campaign Management (Weekly Tasks)</h3>
+                        <div class="space-y-2">
+                             <div class="task-item flex items-center"><input id="task-weekly-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-weekly-1" class="ml-3 text-gray-700">Review "Search Terms" Report for wasted spend</label></div>
+                             <div class="task-item flex items-center"><input id="task-weekly-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-weekly-2" class="ml-3 text-gray-700">Add new Negative Keywords from report</label></div>
+                             <div class="task-item flex items-center"><input id="task-weekly-3" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-weekly-3" class="ml-3 text-gray-700">Check Ad Performance (Click-Through Rate)</label></div>
+                        </div>
+                         <h3 class="text-xl font-semibold mt-6 mb-2">C. Seasonal Ad Group Status</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse" id="ad-groups-table">
+                                <thead>
+                                    <tr><th class="p-3 border-b">Ad Group</th><th class="p-3 border-b">Recommended Season</th><th class="p-3 border-b">Status</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">Furnace Maintenance</td>
+                                        <td class="p-3 border-b">Fall / Winter</td>
+                                        <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">Emergency Furnace Repair</td>
+                                        <td class="p-3 border-b">Fall / Winter</td>
+                                        <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
+                                     <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">New Furnace Installation</td>
+                                        <td class="p-3 border-b">Fall / Winter</td>
+                                        <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">Emergency AC Repair</td>
+                                        <td class="p-3 border-b">Spring / Summer</td>
+                                        <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">AC Tune-Up</td>
+                                        <td class="p-3 border-b">Spring</td>
+                                        <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 border-b">New AC Installation</td>
+                                        <td class="p-3 border-b">Spring / Summer</td>
+                                        <td class="p-3 border-b"><select class="status-select"><option value="active">✅ Active</option><option value="paused">❌ Paused</option></select></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <h3 class="text-xl font-semibold mt-6 mb-2">D. New Campaign Ideas</h3>
+                        <div class="space-y-2">
+                             <div class="task-item flex items-center"><input id="task-ads-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-ads-1" class="ml-3 text-gray-700">Launch a Retargeting Campaign</label></div>
+                             <div class="task-item flex items-center"><input id="task-ads-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-ads-2" class="ml-3 text-gray-700">Test Call-Only Ads for Emergencies</label></div>
+                             <div class="task-item flex items-center"><input id="task-ads-3" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-ads-3" class="ml-3 text-gray-700">Test Performance Max Campaign</label></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                <div class="dashboard-card">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold mb-4">Pillar 6: Strategy & Brainstorming</h2>
+                        <p class="text-gray-600 text-sm mb-2">Use this shared space to jot down campaign ideas, email drafts, or meeting notes. It saves automatically.</p>
+                        <textarea id="strategy-notes" class="w-full h-64 p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-700 leading-relaxed" placeholder="Type your ideas here..."></textarea>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                        <div class="p-6">
+                            <h2 class="text-2xl font-bold mb-4">Pillar 2: Off-Page SEO (Local)</h2>
+                            <h3 class="text-xl font-semibold mb-2">A. Google Business Profile (Weekly)</h3>
+                            <div class="space-y-2">
+                                <div class="task-item flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <input id="task-gbp-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-gbp-1" class="ml-3 text-gray-700">Plan Weekly GBP & Facebook Posts</label>
+                                    </div>
+                                    <a href="https://mechanicaltemp.com/" class="bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold py-1 px-3 rounded-lg transition">Open Website</a>
+                                </div>
+                                <div class="task-item flex items-center"><input id="task-gbp-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-gbp-2" class="ml-3 text-gray-700">Add New Job Photos</label></div>
+                                <div class="task-item flex items-center"><input id="task-gbp-3" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-gbp-3" class="ml-3 text-gray-700">Respond to All New Reviews</label></div>
+                            </div>
+                             <h3 class="text-xl font-semibold mt-6 mb-2">B. Foundational Tasks</h3>
+                            <div class="space-y-2">
+                                <div class="task-item flex items-center"><input id="task-offpage-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-offpage-1" class="ml-3 text-gray-700">Build Local Citations (Yelp, Angi, BBB)</label></div>
+                                <div class="task-item flex items-center"><input id="task-offpage-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-offpage-2" class="ml-3 text-gray-700">Proactively ask satisfied customers for reviews</label></div>
+                            </div>
+                       </div>
+                </div>
+                <div class="dashboard-card">
+                       <div class="p-6">
+                            <h2 class="text-2xl font-bold mb-4">Pillar 3: Technical SEO</h2>
+                            <h3 class="text-xl font-semibold mb-2">A. Monthly Health Check</h3>
+                            <div class="space-y-2">
+                                <div class="task-item flex items-center"><input id="task-tech-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label class="ml-3 text-gray-700"><a href="https://pagespeed.web.dev/" target="_blank" class="hover:underline text-blue-600">Run PageSpeed Insights report</a></label></div>
+                                <div class="task-item flex items-center"><input id="task-tech-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-tech-2" class="ml-3 text-gray-700">Check for crawl errors (in GSC)</label></div>
+                                <div class="task-item flex items-center"><input id="task-tech-3" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-tech-3" class="ml-3 text-gray-700">Add Schema Markup to website</label></div>
+                            </div>
+                            <h3 class="text-xl font-semibold mt-6 mb-2">B. How-To Guides & Summaries</h3>
+                            <div class="text-sm text-gray-600">
+                               <p><strong>How to Check for Crawl Errors:</strong><br> 1. Go to Google Search Console (GSC). <br>2. In the left menu, click 'Indexing' > 'Pages'. <br>3. Scroll down to the "Why pages aren't indexed" section. <br>4. Look for "Not found (404)" errors. If important pages are listed, set up a redirect in Squarespace.</p>
+                            </div>
+                       </div>
+                </div>
+                <div class="dashboard-card">
+                       <div class="p-6">
+                            <h2 class="text-2xl font-bold mb-4">Pillar 4: Growth & Retention</h2>
+                            <h3 class="text-xl font-semibold mb-2">A. Customer Retention</h3>
+                            <div class="space-y-2">
+                                <div class="task-item flex items-center"><input id="task-growth-1" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-growth-1" class="ml-3 text-gray-700">Implement Service Reminder emails/texts</label></div>
+                                <div class="task-item flex items-center"><input id="task-growth-2" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-growth-2" class="ml-3 text-gray-700">Start a simple customer referral program</label></div>
+                            </div>
+                            <h3 class="text-xl font-semibold mt-6 mb-2">B. Community & Offline Presence</h3>
+                            <div class="space-y-2">
+                                 <div class="task-item flex items-center"><input id="task-growth-4" type="checkbox" class="h-4 w-4 rounded task-checkbox"><label for="task-growth-4" class="ml-3 text-gray-700">Use lawn signs after jobs (with permission)</label></div>
+                            </div>
+                       </div>
+                </div>
+                 <div class="dashboard-card">
+                       <div class="p-6">
+                            <h2 class="text-2xl font-bold mb-4">🎯 Q4 2025 Goals</h2>
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                               <li>Publish 2 new blog posts.</li>
+                               <li>Generate 15 qualified leads from Google Ads.</li>
+                               <li>Achieve a Cost Per Lead of under $75.</li>
+                               <li>Generate 10 new 5-star reviews on Google.</li>
+                            </ul>
+                       </div>
+                </div>
             </div>
         </div>
-    </header>
+    </div>
 
-    <!-- Main Content -->
-    <main class="flex-grow p-4 sm:p-6 lg:p-8">
-        <div id="grid-container" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <p id="loading-text" class="text-center text-gray-500 col-span-full">Initializing secure connection...</p>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-auto">
-        <div class="max-w-7xl mx-auto py-6 px-4 text-center text-gray-500 text-sm">
-            <p>Data is saved automatically to <span class="font-semibold text-blue-600">Cloud Firestore</span>.</p>
-        </div>
-    </footer>
-
-    <!-- Edit Modal -->
-    <dialog id="add-modal" class="p-0 rounded-lg shadow-xl backdrop:bg-gray-900/50 w-full max-w-md">
-        <div class="bg-white p-6">
-            <h3 class="text-lg font-semibold mb-4">Add New Task</h3>
-            <input type="text" id="new-task-input" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="e.g., Call accountant">
-            <div class="flex justify-end gap-3 mt-6">
-                <button id="modal-cancel-btn" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">Cancel</button>
-                <button id="modal-add-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add Task</button>
-            </div>
-        </div>
-    </dialog>
-
-    <!-- Firebase & App Logic -->
+    <!-- FIREBASE INTEGRATION -->
     <script type="module">
-        // Using the exact same imports as your working dashboard (v11.0.2)
+        // 1. Import Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
         import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-        // --- Configuration ---
-        // USING YOUR WORKING CONFIGURATION
+        // 2. INITIALIZE FIREBASE
         const firebaseConfig = {
              apiKey: "AIzaSyBEjJhmkhRJfTzDyscwqiVvuf1YkFAX5Ro",
              authDomain: "gen-lang-client-0527243008.firebaseapp.com",
@@ -122,330 +311,254 @@
              measurementId: "G-353V9E57VG"
         };
         
-        // Use a distinct ID for this specific app within the shared project
-        const appId = "weekly-workflow-tracker";
-        
+        const appId = 'mechanical-temp-dashboard';
+
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+        const analytics = getAnalytics(app);
         const db = getFirestore(app);
-        const googleProvider = new GoogleAuthProvider();
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        
+        let docRef = null;
+        let unsubscribeSnapshot = null;
 
-        // --- State Management ---
-        let workflowData = [];
-        let isEditMode = false;
-        let currentUserId = null;
-        let unsubscribeData = null; // Listener cleanup function
-        let currentDayIndexForAdd = null;
+        // --- AUTHENTICATION LOGIC ---
+        const btnGoogleLogin = document.getElementById('btn-google-login');
+        const btnLogout = document.getElementById('btn-logout');
+        const authContainer = document.getElementById('auth-container');
+        const userDisplay = document.getElementById('user-display');
+        const userName = document.getElementById('user-name');
+        const userPhoto = document.getElementById('user-photo');
 
-        // --- Default Data ---
-        const defaultData = [
-            { day: "Weekend Prep", color: "indigo", tasks: [{ text: "Set up 20 posts on Buffer", done: false }, { text: "Set up 5 posts on X", done: false }] },
-            { day: "Monday", color: "blue", subtext: "AM: Check Marketing Mgmt", tasks: [{ text: "Check Marketing Management (AM)", done: false }, { text: "Finish quotes from last week", done: false }, { text: "Nextdoor post", done: false }, { text: "Field work (Rest of day)", done: false }, { text: "Balance bookkeeping", done: false }] },
-            { day: "Tuesday", color: "blue", subtext: "AM: Check Marketing (1hr)", tasks: [{ text: "Check Marketing Mgmt (1 hr)", done: false }, { text: "Draft new blog post for Friday", done: false }, { text: "Field work", done: false }] },
-            { day: "Wednesday", color: "blue", subtext: "AM: Check Marketing & Finance", tasks: [{ text: "Check Marketing Management", done: false }, { text: "Check over financials", done: false }, { text: "Nextdoor post", done: false }, { text: "Field work", done: false }, { text: "Balance bookkeeping", done: false }] },
-            { day: "Thursday", color: "blue", subtext: "AM: Check Marketing", tasks: [{ text: "Check Marketing Management", done: false }, { text: "Finish any open quotes", done: false }, { text: "Field work", done: false }] },
-            { day: "Friday", color: "purple", subtext: "Payroll & Wrap-up", tasks: [{ text: "Process Payroll", done: false }, { text: "Check Marketing Management", done: false }, { text: "Nextdoor post", done: false }, { text: "Release blog post & update page", done: false }, { text: "Balance bookkeeping", done: false }] }
-        ];
-
-        // --- Authentication UI Logic ---
-        const signInBtn = document.getElementById('google-signin-btn');
-        const userProfile = document.getElementById('user-profile');
-        const userEmailSpan = document.getElementById('user-email');
-        const userAvatar = document.getElementById('user-avatar');
-        const signOutBtn = document.getElementById('signout-btn');
-
-        // Handle Google Sign In
-        signInBtn.addEventListener('click', async () => {
+        btnGoogleLogin.addEventListener('click', async () => {
             try {
-                await signInWithPopup(auth, googleProvider);
+                await signInWithPopup(auth, provider);
             } catch (error) {
-                console.error("Error signing in:", error);
-                alert("Sign in failed: " + error.message);
+                console.error("Login failed:", error);
+                showError("Login failed: " + error.message);
             }
         });
 
-        // Handle Sign Out
-        signOutBtn.addEventListener('click', async () => {
+        btnLogout.addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                // On signout, try anon login to keep app visible but read-only/empty
-                signInAnonymously(auth).catch(() => {}); 
             } catch (error) {
-                console.error("Error signing out:", error);
+                console.error("Logout failed:", error);
             }
         });
 
-        // Listen for Auth State
-        onAuthStateChanged(auth, (user) => {
-            const editBtn = document.getElementById('edit-btn');
-            const resetBtn = document.getElementById('reset-btn');
+        // No API Key needed anymore!
+        
+        const showError = (msg) => {
+            const errorBanner = document.getElementById('auth-error');
+            errorBanner.innerHTML = `<p class="font-bold">Error</p><p>${msg}</p>`;
+            errorBanner.style.display = 'block';
+        };
 
-            if (user) {
-                currentUserId = user.uid;
-                
-                // Update UI based on whether user is Anonymous or Google
-                if (user.isAnonymous) {
-                    // Show Sign In Button, Hide Profile
-                    signInBtn.classList.remove('hidden');
-                    userProfile.classList.add('hidden');
+        document.addEventListener('DOMContentLoaded', async () => {
+            
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    console.log("User authenticated:", user.uid);
+                    document.getElementById('auth-error').style.display = 'none';
+                    
+                    btnGoogleLogin.classList.add('hidden');
+                    userDisplay.style.display = 'flex';
+                    userName.textContent = user.displayName || "Anonymous";
+                    if (user.photoURL) userPhoto.src = user.photoURL;
+                    
+                    docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'marketing_dashboard', 'main');
+                    initRealtimeListener();
                 } else {
-                    // Hide Sign In Button, Show Profile
-                    signInBtn.classList.add('hidden');
-                    userProfile.classList.remove('hidden');
-                    userProfile.classList.add('flex');
-                    userEmailSpan.textContent = user.email || "User";
-                    userAvatar.textContent = (user.email || "U")[0].toUpperCase();
-                    if (user.photoURL) {
-                        userAvatar.innerHTML = `<img src="${user.photoURL}" class="w-full h-full rounded-full" alt="Profile">`;
+                    console.log("User signed out");
+                    btnGoogleLogin.classList.remove('hidden');
+                    userDisplay.style.display = 'none';
+                    if(unsubscribeSnapshot) unsubscribeSnapshot();
+                    docRef = null;
+                }
+            });
+
+            const saveState = async () => {
+                if (!docRef) return; 
+
+                const servicePages = [];
+                document.querySelectorAll('#service-pages-table-body tr').forEach(row => {
+                    const city = row.cells[0].textContent;
+                    servicePages.push({ city });
+                });
+
+                const blogPosts = [];
+                document.querySelectorAll('#blog-post-list .task-item').forEach(item => {
+                    const title = item.querySelector('a').textContent;
+                    const checked = item.querySelector('input').checked;
+                    blogPosts.push({ title, checked });
+                });
+
+                const checkboxStates = {};
+                document.querySelectorAll('.task-checkbox').forEach(box => {
+                    if(box.id) checkboxStates[box.id] = box.checked;
+                });
+
+                const adGroupStatuses = {};
+                document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
+                    const adGroupName = select.closest('tr').cells[0].textContent;
+                    adGroupStatuses[adGroupName] = select.value;
+                });
+                
+                // Capture Notes
+                const notes = document.getElementById('strategy-notes').value;
+
+                try {
+                    await setDoc(docRef, {
+                        servicePages,
+                        blogPosts,
+                        checkboxStates,
+                        adGroupStatuses,
+                        notes,
+                        lastUpdated: new Date()
+                    });
+                    console.log("Saved to Firebase");
+                } catch (e) {
+                    console.error("Error saving to database: ", e);
+                    if(e.code === 'permission-denied') {
+                        showError("Permission Denied. Database rules rejected the write.");
                     }
                 }
+            };
 
-                editBtn.disabled = false;
-                resetBtn.disabled = false;
+            const initRealtimeListener = () => {
+                if (!docRef) return;
+
+                unsubscribeSnapshot = onSnapshot(docRef, (docSnapshot) => {
+                    if (docSnapshot.exists()) {
+                        const data = docSnapshot.data();
+                        
+                        const tableBody = document.getElementById('service-pages-table-body');
+                        tableBody.innerHTML = '';
+                        if(data.servicePages) {
+                            data.servicePages.forEach(page => {
+                                const newRow = document.createElement('tr');
+                                newRow.classList.add('hover:bg-gray-50');
+                                const slug = page.city.toLowerCase().replace(/\s+/g, '-');
+                                // Update URL format here
+                                const newUrl = `https://mechanicaltemp.com/${slug}.html`;
+                                newRow.innerHTML = `
+                                    <td class="p-3 border-b">${page.city}</td>
+                                    <td class="p-3 border-b"><a href="${newUrl}" target="_blank" class="text-blue-600 hover:underline">/${slug}.html</a></td>
+                                    <td class="p-3 border-b"><span class="status-live">✅ Live</span></td>
+                                    <td class="p-3 border-b text-center">
+                                        <button class="delete-city-btn text-red-500 hover:text-red-700 font-bold px-2" title="Delete">✕</button>
+                                    </td>
+                                `;
+                                tableBody.appendChild(newRow);
+                            });
+                        }
+
+                        const blogList = document.getElementById('blog-post-list');
+                        blogList.innerHTML = '';
+                        if(data.blogPosts) {
+                            data.blogPosts.forEach(post => {
+                                const newItem = document.createElement('div');
+                                newItem.classList.add('task-item', 'flex', 'items-center');
+                                const safeTitle = post.title.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+                                const newId = 'task-blog-' + safeTitle;
+                                newItem.innerHTML = `<input id="${newId}" type="checkbox" class="h-4 w-4 rounded task-checkbox" ${post.checked ? 'checked' : ''}><label class="ml-3 text-gray-700"><a href="#" class="hover:underline text-blue-600">${post.title}</a></label>`;
+                                blogList.appendChild(newItem);
+                            });
+                            document.querySelectorAll('#blog-post-list .task-checkbox').forEach(el => el.addEventListener('change', saveState));
+                        }
+
+                        if(data.checkboxStates) {
+                            for (const id in data.checkboxStates) {
+                                const checkbox = document.getElementById(id);
+                                if (checkbox) checkbox.checked = data.checkboxStates[id];
+                            }
+                        }
+
+                        if(data.adGroupStatuses) {
+                            document.querySelectorAll('#ad-groups-table .status-select').forEach(select => {
+                                const adGroupName = select.closest('tr').cells[0].textContent;
+                                if (data.adGroupStatuses[adGroupName]) {
+                                    select.value = data.adGroupStatuses[adGroupName];
+                                }
+                                updateSelectAppearance(select);
+                            });
+                        }
+                        
+                        // Load Notes
+                        if (data.notes) {
+                             document.getElementById('strategy-notes').value = data.notes;
+                        }
+                        
+                    } else {
+                        console.log("Database document created (waiting for input)");
+                    }
+                }, (error) => {
+                    console.error("Error listening to database:", error);
+                });
+            };
+
+            const updateSelectAppearance = (selectElement) => {
+                selectElement.classList.remove('status-active', 'status-paused');
+                selectElement.classList.add(selectElement.value === 'active' ? 'status-active' : 'status-paused');
+            };
+
+            function setupEventListeners() {
+                document.getElementById('add-city-btn').addEventListener('click', () => {
+                    const cityNameInput = document.getElementById('new-city-name');
+                    if (cityNameInput.value.trim()) {
+                        const tableBody = document.getElementById('service-pages-table-body');
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `<td class="p-3 border-b">${cityNameInput.value.trim()}</td><td>...</td><td>...</td><td>...</td>`;
+                        tableBody.appendChild(newRow);
+                        saveState();
+                        cityNameInput.value = '';
+                    }
+                });
+
+                document.getElementById('add-blog-btn').addEventListener('click', () => {
+                    const blogPostInput = document.getElementById('new-blog-post');
+                    if (blogPostInput.value.trim()) {
+                        const blogList = document.getElementById('blog-post-list');
+                        const newItem = document.createElement('div');
+                        newItem.classList.add('task-item');
+                        newItem.innerHTML = `<input type="checkbox"><label><a>${blogPostInput.value.trim()}</a></label>`;
+                        blogList.appendChild(newItem);
+                        saveState();
+                        blogPostInput.value = '';
+                    }
+                });
+
+                document.body.addEventListener('change', (e) => {
+                    if(e.target.classList.contains('task-checkbox')) {
+                        saveState();
+                    }
+                    if(e.target.classList.contains('status-select')) {
+                        updateSelectAppearance(e.target);
+                        saveState();
+                    }
+                });
+
+                // Handle Delete Button Click
+                document.body.addEventListener('click', (e) => {
+                    if (e.target.closest('.delete-city-btn')) {
+                        const row = e.target.closest('tr');
+                        row.remove();
+                        saveState();
+                    }
+                });
                 
-                // Load data immediately after auth
-                setupDataListener(user.uid);
-            } else {
-                // If no user at all, try anonymous login to at least show the app
-                signInAnonymously(auth).catch(console.error);
-            }
-        });
-
-        // --- Database Logic (Firestore) ---
-        function setupDataListener(userId) {
-            if (!userId) return;
-
-            // Stop listening to previous user's data if any
-            if (unsubscribeData) {
-                unsubscribeData();
-            }
-
-            // Path: artifacts/weekly-workflow-tracker/users/{userId}/data/workflow
-            const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'workflow');
-
-            unsubscribeData = onSnapshot(docRef, (docSnap) => {
-                const loadingText = document.getElementById('loading-text');
-                if (loadingText) loadingText.remove();
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    workflowData = data.items || defaultData;
-                } else {
-                    workflowData = defaultData;
-                }
-                render();
-            }, (error) => {
-                console.error("Data fetch error:", error);
-                const container = document.getElementById('grid-container');
-                container.innerHTML = '<p class="text-red-500 text-center col-span-full">Error syncing data. If you just switched accounts, please refresh.</p>';
-            });
-        }
-
-        async function saveData() {
-            if (!currentUserId) return;
-            
-            const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'data', 'workflow');
-            try {
-                await setDoc(docRef, { items: workflowData });
-                updateProgress();
-            } catch (e) {
-                console.error("Save failed:", e);
-            }
-        }
-
-        // --- UI Logic ---
-        
-        window.toggleTask = (dayIndex, taskIndex) => {
-            if (isEditMode) return;
-            workflowData[dayIndex].tasks[taskIndex].done = !workflowData[dayIndex].tasks[taskIndex].done;
-            saveData(); 
-            render();   
-        };
-
-        window.deleteTask = (dayIndex, taskIndex) => {
-            if (!confirm("Delete this task?")) return;
-            workflowData[dayIndex].tasks.splice(taskIndex, 1);
-            saveData();
-            render();
-        };
-
-        window.updateTaskText = (dayIndex, taskIndex, newText) => {
-            workflowData[dayIndex].tasks[taskIndex].text = newText;
-            saveData();
-        };
-
-        // Edit Mode Toggle
-        const editBtn = document.getElementById('edit-btn');
-        editBtn.addEventListener('click', () => {
-            isEditMode = !isEditMode;
-            const body = document.body;
-            const btnText = document.getElementById('edit-text');
-            
-            if (isEditMode) {
-                body.classList.add('edit-mode');
-                btnText.textContent = "Done Editing";
-                editBtn.classList.add('bg-yellow-100', 'border-yellow-300', 'text-yellow-800');
-                editBtn.classList.remove('bg-white', 'border-gray-300', 'text-gray-700');
-            } else {
-                body.classList.remove('edit-mode');
-                btnText.textContent = "Edit Tasks";
-                editBtn.classList.remove('bg-yellow-100', 'border-yellow-300', 'text-yellow-800');
-                editBtn.classList.add('bg-white', 'border-gray-300', 'text-gray-700');
-            }
-            render();
-        });
-
-        // Reset Week
-        const resetBtn = document.getElementById('reset-btn');
-        resetBtn.addEventListener('click', () => {
-            if(confirm("Start a new week? This will uncheck all tasks.")) {
-                workflowData.forEach(day => {
-                    day.tasks.forEach(task => task.done = false);
-                });
-                saveData();
-                render();
-            }
-        });
-
-        // --- Modal Logic ---
-        window.openAddModal = (dayIndex) => {
-            currentDayIndexForAdd = dayIndex;
-            const modal = document.getElementById('add-modal');
-            document.getElementById('new-task-input').value = '';
-            modal.showModal();
-            document.getElementById('new-task-input').focus();
-        };
-
-        document.getElementById('modal-cancel-btn').addEventListener('click', () => {
-            document.getElementById('add-modal').close();
-        });
-
-        document.getElementById('modal-add-btn').addEventListener('click', () => {
-            const input = document.getElementById('new-task-input');
-            const text = input.value.trim();
-            if (text && currentDayIndexForAdd !== null) {
-                workflowData[currentDayIndexForAdd].tasks.push({ text: text, done: false });
-                saveData();
-                render();
-                document.getElementById('add-modal').close();
-            }
-        });
-
-        // --- Helpers ---
-        function updateDate() {
-            const options = { weekday: 'long', month: 'long', day: 'numeric' };
-            document.getElementById('date-display').textContent = new Date().toLocaleDateString('en-US', options);
-        }
-        updateDate();
-
-        function getIcon(text) {
-            const t = text.toLowerCase();
-            if (t.includes('buffer') || t.includes('x') || t.includes('post') || t.includes('nextdoor')) return 'fa-share-nodes';
-            if (t.includes('marketing')) return 'fa-bullhorn';
-            if (t.includes('quote')) return 'fa-file-invoice-dollar';
-            if (t.includes('field')) return 'fa-tractor';
-            if (t.includes('bookkeeping') || t.includes('financial')) return 'fa-calculator';
-            if (t.includes('payroll')) return 'fa-money-bill-wave';
-            if (t.includes('blog')) return 'fa-pen-nib';
-            return 'fa-check';
-        }
-
-        function updateProgress() {
-            let total = 0;
-            let completed = 0;
-            if(workflowData) {
-                workflowData.forEach(day => {
-                    day.tasks.forEach(task => {
-                        total++;
-                        if (task.done) completed++;
+                // Save notes on typing
+                const notesArea = document.getElementById('strategy-notes');
+                if(notesArea) {
+                    notesArea.addEventListener('input', () => {
+                         saveState();
                     });
-                });
+                }
             }
-            const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
-            document.getElementById('progress-fill').style.width = `${percent}%`;
-            document.getElementById('progress-text').textContent = `${percent}% Complete`;
-        }
 
-        function render() {
-            const container = document.getElementById('grid-container');
-            
-            if (!workflowData || workflowData.length === 0) {
-                return; 
-            } 
-            
-            container.innerHTML = ''; 
-
-            workflowData.forEach((dayData, dayIndex) => {
-                const dayTotal = dayData.tasks.length;
-                const dayDone = dayData.tasks.filter(t => t.done).length;
-                const dayProgress = dayTotal === 0 ? 0 : (dayDone / dayTotal) * 100;
-                const isComplete = dayTotal > 0 && dayDone === dayTotal;
-
-                const card = document.createElement('div');
-                card.className = `bg-white rounded-xl shadow-sm border ${isComplete ? 'border-green-200 bg-green-50' : 'border-gray-200'} overflow-hidden flex flex-col transition-all duration-300 hover:shadow-md`;
-
-                const header = document.createElement('div');
-                header.className = `p-4 border-b ${isComplete ? 'border-green-100' : 'border-gray-100'} bg-opacity-50 ${dayData.color === 'indigo' ? 'bg-indigo-50' : dayData.color === 'purple' ? 'bg-purple-50' : 'bg-blue-50'}`;
-                header.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h2 class="font-bold text-lg text-gray-800">${dayData.day}</h2>
-                            ${dayData.subtext ? `<p class="text-xs text-gray-500 mt-1">${dayData.subtext}</p>` : ''}
-                        </div>
-                        ${isComplete ? '<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-bold">DONE</span>' : ''}
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-1 mt-3">
-                        <div class="bg-${dayData.color}-500 h-1 rounded-full transition-all duration-500" style="width: ${dayProgress}%"></div>
-                    </div>
-                `;
-                card.appendChild(header);
-
-                const list = document.createElement('div');
-                list.className = 'p-4 flex-grow space-y-3';
-
-                dayData.tasks.forEach((task, taskIndex) => {
-                    const item = document.createElement('div');
-                    item.className = `flex items-center gap-3 group ${task.done ? 'task-done' : ''}`;
-                    
-                    const iconClass = getIcon(task.text);
-
-                    const viewHTML = `
-                        <label class="checkbox-wrapper relative flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only" ${task.done ? 'checked' : ''} onchange="toggleTask(${dayIndex}, ${taskIndex})">
-                            <div class="w-5 h-5 border-2 border-gray-300 rounded bg-white flex items-center justify-center transition-colors hover:border-${dayData.color}-400">
-                                <svg class="w-3 h-3 text-white hidden fill-current" viewBox="0 0 20 20"><path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/></svg>
-                            </div>
-                        </label>
-                        <i class="fa-solid ${iconClass} text-gray-400 text-xs w-4 text-center ${isEditMode ? 'hidden' : ''}"></i>
-                        <span class="task-text text-sm text-gray-700 select-none flex-grow cursor-pointer" onclick="toggleTask(${dayIndex}, ${taskIndex})">${task.text}</span>
-                    `;
-
-                    const editHTML = `
-                        <button onclick="deleteTask(${dayIndex}, ${taskIndex})" class="delete-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                        <input type="text" 
-                            value="${task.text}" 
-                            onchange="updateTaskText(${dayIndex}, ${taskIndex}, this.value)"
-                            class="flex-grow text-sm border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    `;
-
-                    item.innerHTML = isEditMode ? editHTML : viewHTML;
-                    list.appendChild(item);
-                });
-
-                const addBtn = document.createElement('button');
-                addBtn.className = 'add-btn w-full mt-2 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-400 text-sm hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50 transition-all items-center justify-center gap-2';
-                addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Task';
-                addBtn.onclick = () => openAddModal(dayIndex);
-                list.appendChild(addBtn);
-
-                card.appendChild(list);
-                container.appendChild(card);
-            });
-            
-            updateProgress();
-        }
+            setupEventListeners();
+        });
     </script>
 </body>
 </html>
