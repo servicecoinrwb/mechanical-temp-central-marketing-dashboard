@@ -4,38 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Business Workflow</title>
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebase/9.1.0/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebase/9.1.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebase/9.1.0/firebase-firestore.js";
-        
-        // --- Your Firebase Configuration ---
-        const firebaseConfig = {
-          apiKey: "AIzaSyAd3taUTwf9AJv6M7RMvCWKlgw_pdqrRpM",
-          authDomain: "weekly-workflow-478915.firebaseapp.com",
-          projectId: "weekly-workflow-478915",
-          storageBucket: "weekly-workflow-478915.firebasestorage.app",
-          messagingSenderId: "1035427962286",
-          appId: "1:1035427962286:web:2e23291d8926bed94f3c3f",
-          measurementId: "G-8SRKJDSDX3"
-        };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app); // Initialize Auth
-        const db = getFirestore(app); // Initialize Firestore
-        
-        // Expose Firebase objects globally for existing script to use (since we're using type="module")
-        window.auth = auth;
-        window.db = db;
-        window.signInAnonymously = signInAnonymously;
-        window.onAuthStateChanged = onAuthStateChanged;
-        window.doc = doc;
-        window.setDoc = setDoc;
-        window.onSnapshot = onSnapshot;
-
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
@@ -119,6 +91,22 @@
     </dialog>
 
     <script>
+        // --- Firebase Configuration and Initialization (Compatible Version) ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyAd3taUTwf9AJv6M7RMvCWKlgw_pdqrRpM",
+          authDomain: "weekly-workflow-478915.firebaseapp.com",
+          projectId: "weekly-workflow-478915",
+          storageBucket: "weekly-workflow-478915.firebasestorage.app",
+          messagingSenderId: "1035427962286",
+          appId: "1:1035427962286:web:2e23291d8926bed94f3c3f",
+          measurementId: "G-8SRKJDSDX3"
+        };
+
+        // Initialize Firebase using the globally available firebase object
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth(); 
+        const db = firebase.firestore(); 
+
         // Default Data Structure (Used only for first-time database population)
         const defaultData = [
             {
@@ -205,13 +193,15 @@
         // --- FIREBASE AUTH & DB LISTENERS ---
 
         function signInUser() {
-            // Use the globally available auth object from the module script
-            window.signInAnonymously(window.auth)
+            // Use the globally available auth object
+            auth.signInAnonymously()
                 .then(() => {
-                    window.onAuthStateChanged(window.auth, (user) => {
+                    auth.onAuthStateChanged((user) => {
                         if (user) {
                             currentUserId = user.uid;
                             listenToWorkflowData();
+                        } else {
+                            document.getElementById('loading-text').textContent = 'Error: Authentication failed.';
                         }
                     });
                 })
@@ -223,14 +213,15 @@
 
         function listenToWorkflowData() {
             // Reference to the master document
-            const docRef = window.doc(window.db, DB_COLLECTION, DB_DOCUMENT);
+            const docRef = db.collection(DB_COLLECTION).doc(DB_DOCUMENT);
 
             // Set up real-time listener
-            window.onSnapshot(docRef, (docSnap) => {
+            docRef.onSnapshot((docSnap) => {
                 const loadingText = document.getElementById('loading-text');
-                if (docSnap.exists()) {
+                if (docSnap.exists) {
                     // Data exists, load it
-                    workflowData = docSnap.data().data;
+                    // Note: Firestore data structure is docSnap.data().data
+                    workflowData = docSnap.data().data || defaultData;
                     if (loadingText) loadingText.remove(); // Remove loading text once data is here
                     render();
                 } else {
@@ -253,16 +244,16 @@
                 return;
             }
             
-            const docRef = window.doc(window.db, DB_COLLECTION, DB_DOCUMENT);
+            const docRef = db.collection(DB_COLLECTION).doc(DB_DOCUMENT);
             // Overwrite the document with the new data array inside an object
-            window.setDoc(docRef, { data: workflowData })
+            docRef.set({ data: workflowData })
                 .catch((error) => {
                     console.error("Error writing document: ", error);
                 });
             // render() is called automatically by the real-time listener (onSnapshot)
         }
 
-        // --- CORE UI/DATA LOGIC (Calls save() instead of localStorage) ---
+        // --- CORE UI/DATA LOGIC ---
 
         function updateDate() {
             const options = { weekday: 'long', month: 'long', day: 'numeric' };
@@ -370,14 +361,13 @@
         function render() {
             const container = document.getElementById('grid-container');
             
-            // Do not clear the container if the loading text is present and data isn't loaded yet
-            if (workflowData.length === 0 && !document.getElementById('loading-text')) {
-                container.innerHTML = '<p id="loading-text" class="text-center text-gray-500 col-span-full">Loading workflow data...</p>';
+            // Only render the actual list if data is present
+            if (workflowData.length === 0) {
                 return;
-            } else if (workflowData.length > 0) {
-                 // Clear the grid only when we have data to render
-                container.innerHTML = ''; 
-            }
+            } 
+            
+            // Clear the grid only when we have data to render
+            container.innerHTML = ''; 
 
             workflowData.forEach((dayData, dayIndex) => {
                 // Calculate daily progress
