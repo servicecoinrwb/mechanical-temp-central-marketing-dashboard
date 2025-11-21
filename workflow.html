@@ -104,25 +104,26 @@
 
     <!-- Firebase & App Logic -->
     <script type="module">
-        // Using CDN imports compatible with standalone HTML files
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Using the exact same imports as your working dashboard (v11.0.2)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
         // --- Configuration ---
-        // UPDATED: Using your exact provided configuration
+        // USING YOUR WORKING CONFIGURATION
         const firebaseConfig = {
-            apiKey: "AIzaSyAd3taUTwf9AJv6M7RMvCWKlgw_pdqrRpM",
-            authDomain: "weekly-workflow-478915.firebaseapp.com", 
-            projectId: "weekly-workflow-478915",
-            storageBucket: "weekly-workflow-478915.firebasestorage.app",
-            messagingSenderId: "1035427962286",
-            appId: "1:1035427962286:web:2e23291d8926bed94f3c3f",
-            measurementId: "G-8SRKJDSDX3"
+             apiKey: "AIzaSyBEjJhmkhRJfTzDyscwqiVvuf1YkFAX5Ro",
+             authDomain: "gen-lang-client-0527243008.firebaseapp.com",
+             projectId: "gen-lang-client-0527243008",
+             storageBucket: "gen-lang-client-0527243008.firebasestorage.app",
+             messagingSenderId: "364776086784",
+             appId: "1:364776086784:web:5fff5cf8938440e6bb27e5",
+             measurementId: "G-353V9E57VG"
         };
         
-        // Use the Project ID as the App ID for data storage consistency
-        const appId = "weekly-workflow-478915";
+        // Use a distinct ID for this specific app within the shared project
+        const appId = "weekly-workflow-tracker";
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -159,7 +160,7 @@
                 await signInWithPopup(auth, googleProvider);
             } catch (error) {
                 console.error("Error signing in:", error);
-                alert("Sign in failed. Check console.");
+                alert("Sign in failed: " + error.message);
             }
         });
 
@@ -167,9 +168,8 @@
         signOutBtn.addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                // On signout, we might want to signInAnonymously again to keep app usable
-                // or just let the auth state listener handle it (it will go to null, then we can trigger anon)
-                await signInAnonymously(auth);
+                // On signout, try anon login to keep app visible but read-only/empty
+                signInAnonymously(auth).catch(() => {}); 
             } catch (error) {
                 console.error("Error signing out:", error);
             }
@@ -195,6 +195,9 @@
                     userProfile.classList.add('flex');
                     userEmailSpan.textContent = user.email || "User";
                     userAvatar.textContent = (user.email || "U")[0].toUpperCase();
+                    if (user.photoURL) {
+                        userAvatar.innerHTML = `<img src="${user.photoURL}" class="w-full h-full rounded-full" alt="Profile">`;
+                    }
                 }
 
                 editBtn.disabled = false;
@@ -217,6 +220,7 @@
                 unsubscribeData();
             }
 
+            // Path: artifacts/weekly-workflow-tracker/users/{userId}/data/workflow
             const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'workflow');
 
             unsubscribeData = onSnapshot(docRef, (docSnap) => {
@@ -228,14 +232,12 @@
                     workflowData = data.items || defaultData;
                 } else {
                     workflowData = defaultData;
-                    // Optional: Don't auto-save immediately on read-miss to avoid cluttering DB with anon users
-                    // But helpful for UX
                 }
                 render();
             }, (error) => {
                 console.error("Data fetch error:", error);
                 const container = document.getElementById('grid-container');
-                container.innerHTML = '<p class="text-red-500 text-center col-span-full">Error syncing data. Please refresh.</p>';
+                container.innerHTML = '<p class="text-red-500 text-center col-span-full">Error syncing data. If you just switched accounts, please refresh.</p>';
             });
         }
 
