@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Business Workflow</title>
-
-    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-google-provider-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
@@ -40,6 +35,7 @@
 </head>
 <body class="min-h-screen flex flex-col text-gray-800">
 
+    <!-- Header -->
     <header class="bg-white shadow-sm sticky top-0 z-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -49,18 +45,21 @@
                 </div>
                 
                 <div class="flex items-center gap-3">
-                    <button onclick="toggleEditMode()" id="edit-btn" class="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 hover:bg-gray-50 text-gray-700 transition-colors flex items-center gap-2">
+                    <!-- Auth Status Indicator -->
+                    <div id="auth-status" class="text-xs font-mono bg-gray-100 text-gray-500 px-2 py-1 rounded hidden md:block">
+                        Connecting...
+                    </div>
+
+                    <button id="edit-btn" class="px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 hover:bg-gray-50 text-gray-700 transition-colors flex items-center gap-2" disabled>
                         <i class="fa-solid fa-pen-to-square"></i> <span id="edit-text">Edit Tasks</span>
                     </button>
-                    <button onclick="resetWeek()" class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors flex items-center gap-2">
+                    <button id="reset-btn" class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors flex items-center gap-2" disabled>
                         <i class="fa-solid fa-rotate-right"></i> Start New Week
                     </button>
-                    <button onclick="signInWithGoogle()" id="google-signin-btn" class="px-4 py-2 rounded-lg text-sm font-medium bg-red-600 hover:bg-red-700 text-white shadow-sm transition-colors flex items-center gap-2">
-                        <i class="fa-brands fa-google"></i> Sign In
-                    </button>
-                    </div>
+                </div>
             </div>
             
+            <!-- Progress Bar -->
             <div class="mt-4 w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
                 <div id="progress-fill" class="bg-green-500 h-2.5 rounded-full progress-bar" style="width: 0%"></div>
             </div>
@@ -71,242 +70,231 @@
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="flex-grow p-4 sm:p-6 lg:p-8">
         <div id="grid-container" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <p id="loading-text" class="text-center text-gray-500 col-span-full">Please sign in with Google to view your workflow.</p>
+            <p id="loading-text" class="text-center text-gray-500 col-span-full">Initializing secure connection...</p>
         </div>
     </main>
 
+    <!-- Footer -->
     <footer class="bg-white border-t border-gray-200 mt-auto">
         <div class="max-w-7xl mx-auto py-6 px-4 text-center text-gray-500 text-sm">
-            <p>Data is now saved automatically to **Cloud Firestore**.</p>
+            <p>Data is saved automatically to <span class="font-semibold text-blue-600">Cloud Firestore</span>.</p>
         </div>
     </footer>
 
+    <!-- Edit Modal -->
     <dialog id="add-modal" class="p-0 rounded-lg shadow-xl backdrop:bg-gray-900/50 w-full max-w-md">
         <div class="bg-white p-6">
             <h3 class="text-lg font-semibold mb-4">Add New Task</h3>
             <input type="text" id="new-task-input" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="e.g., Call accountant">
             <div class="flex justify-end gap-3 mt-6">
-                <button onclick="closeModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">Cancel</button>
-                <button onclick="confirmAddTask()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add Task</button>
+                <button id="modal-cancel-btn" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">Cancel</button>
+                <button id="modal-add-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add Task</button>
             </div>
         </div>
     </dialog>
 
-    <script>
-        // --- Firebase Configuration and Initialization (Compatible Version) ---
-        const firebaseConfig = {
-          apiKey: "AIzaSyAd3taUTwf9AJv6M7RMvCWKlgw_pdqrRpM",
-          // CRITICAL FIX: Use the custom domain as the authDomain for reliable redirects
-          authDomain: "marketing.mechanicaltemp.com", 
-          projectId: "weekly-workflow-478915",
-          storageBucket: "weekly-workflow-478915.firebasestorage.app",
-          messagingSenderId: "1035427962286",
-          appId: "1:1035427962286:web:2e23291d8926bed94f3c3f",
-          measurementId: "G-8SRKJDSDX3"
-        };
+    <!-- Firebase & App Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Initialize Firebase using the globally available firebase object
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth(); 
-        const db = firebase.firestore(); 
+        // --- Configuration ---
+        // Use environment variables for secure config
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app';
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Default Data Structure (Used only for first-time database population)
+        // --- State Management ---
+        let workflowData = [];
+        let isEditMode = false;
+        let currentUserId = null;
+        let unsubscribeData = null; // Listener cleanup function
+        let currentDayIndexForAdd = null;
+
+        // --- Default Data ---
         const defaultData = [
-            {
-                day: "Weekend Prep",
-                color: "indigo",
-                tasks: [
-                    { text: "Set up 20 posts on Buffer", done: false },
-                    { text: "Set up 5 posts on X", done: false }
-                ]
-            },
-            {
-                day: "Monday",
-                color: "blue",
-                subtext: "AM: Check Marketing Mgmt",
-                tasks: [
-                    { text: "Check Marketing Management (AM)", done: false },
-                    { text: "Finish quotes from last week", done: false },
-                    { text: "Nextdoor post", done: false },
-                    { text: "Field work (Rest of day)", done: false },
-                    { text: "Balance bookkeeping", done: false }
-                ]
-            },
-            {
-                day: "Tuesday",
-                color: "blue",
-                subtext: "AM: Check Marketing (1hr)",
-                tasks: [
-                    { text: "Check Marketing Mgmt (1 hr)", done: false },
-                    { text: "Draft new blog post for Friday", done: false },
-                    { text: "Field work", done: false }
-                ]
-            },
-            {
-                day: "Wednesday",
-                color: "blue",
-                subtext: "AM: Check Marketing & Finance",
-                tasks: [
-                    { text: "Check Marketing Management", done: false },
-                    { text: "Check over financials", done: false },
-                    { text: "Nextdoor post", done: false },
-                    { text: "Field work", done: false },
-                    { text: "Balance bookkeeping", done: false }
-                ]
-            },
-            {
-                day: "Thursday",
-                color: "blue",
-                subtext: "AM: Check Marketing",
-                tasks: [
-                    { text: "Check Marketing Management", done: false },
-                    { text: "Finish any open quotes", done: false },
-                    { text: "Field work", done: false }
-                ]
-            },
-            {
-                day: "Friday",
-                color: "purple",
-                subtext: "Payroll & Wrap-up",
-                tasks: [
-                    { text: "Process Payroll", done: false },
-                    { text: "Check Marketing Management", done: false },
-                    { text: "Nextdoor post", done: false },
-                    { text: "Release blog post & update page", done: false },
-                    { text: "Balance bookkeeping", done: false }
-                ]
-            }
+            { day: "Weekend Prep", color: "indigo", tasks: [{ text: "Set up 20 posts on Buffer", done: false }, { text: "Set up 5 posts on X", done: false }] },
+            { day: "Monday", color: "blue", subtext: "AM: Check Marketing Mgmt", tasks: [{ text: "Check Marketing Management (AM)", done: false }, { text: "Finish quotes from last week", done: false }, { text: "Nextdoor post", done: false }, { text: "Field work (Rest of day)", done: false }, { text: "Balance bookkeeping", done: false }] },
+            { day: "Tuesday", color: "blue", subtext: "AM: Check Marketing (1hr)", tasks: [{ text: "Check Marketing Mgmt (1 hr)", done: false }, { text: "Draft new blog post for Friday", done: false }, { text: "Field work", done: false }] },
+            { day: "Wednesday", color: "blue", subtext: "AM: Check Marketing & Finance", tasks: [{ text: "Check Marketing Management", done: false }, { text: "Check over financials", done: false }, { text: "Nextdoor post", done: false }, { text: "Field work", done: false }, { text: "Balance bookkeeping", done: false }] },
+            { day: "Thursday", color: "blue", subtext: "AM: Check Marketing", tasks: [{ text: "Check Marketing Management", done: false }, { text: "Finish any open quotes", done: false }, { text: "Field work", done: false }] },
+            { day: "Friday", color: "purple", subtext: "Payroll & Wrap-up", tasks: [{ text: "Process Payroll", done: false }, { text: "Check Marketing Management", done: false }, { text: "Nextdoor post", done: false }, { text: "Release blog post & update page", done: false }, { text: "Balance bookkeeping", done: false }] }
         ];
 
-        // State
-        let workflowData = []; 
-        let isEditMode = false;
-        let currentDayIndexForAdd = null;
-        let currentUserId = null; 
-        const DB_COLLECTION = "workflows"; 
-        const DB_DOCUMENT = "master_workflow_data"; 
+        // --- Authentication Logic ---
+        const initAuth = async () => {
+            try {
+                // Prioritize custom token from environment, fallback to anonymous
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth failed:", error);
+                document.getElementById('loading-text').textContent = "Authentication failed. Please refresh.";
+            }
+        };
 
-        // Init
-        document.addEventListener('DOMContentLoaded', () => {
-            setupAuthListener(); 
-            updateDate();
+        // Start Auth
+        initAuth();
+
+        // Listen for Auth State
+        onAuthStateChanged(auth, (user) => {
+            const editBtn = document.getElementById('edit-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const authStatus = document.getElementById('auth-status');
+
+            if (user) {
+                currentUserId = user.uid;
+                authStatus.textContent = `Secure: ${user.uid.substring(0,6)}...`;
+                authStatus.classList.add('text-green-600', 'bg-green-50');
+                
+                editBtn.disabled = false;
+                resetBtn.disabled = false;
+                
+                // Load data immediately after auth
+                setupDataListener(user.uid);
+            } else {
+                currentUserId = null;
+                authStatus.textContent = "Disconnected";
+                editBtn.disabled = true;
+                resetBtn.disabled = true;
+                if (unsubscribeData) unsubscribeData();
+            }
         });
 
-        // --- FIREBASE AUTH & DB LISTENERS ---
+        // --- Database Logic (Firestore) ---
+        function setupDataListener(userId) {
+            if (!userId) return;
 
-        function setupAuthListener() {
-            // 1. Check for sign-in result immediately after page load (for redirect method)
-            auth.getRedirectResult()
-                .then((result) => {
-                    if (result.user) {
-                        // User signed in successfully via redirect. The listener below will handle UI updates.
-                        console.log("Redirect sign-in successful.");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error getting redirect result:", error.message);
-                });
+            // Correct Path: artifacts/{appId}/users/{userId}/data/workflow
+            const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'workflow');
 
-
-            // 2. Set up the ongoing authentication state listener (Handles both initial sign-in AND persistence)
-            auth.onAuthStateChanged((user) => {
-                const signInBtn = document.getElementById('google-signin-btn');
-                const container = document.getElementById('grid-container');
-
-                if (user) {
-                    // User is signed in.
-                    currentUserId = user.uid;
-                    signInBtn.innerHTML = `<i class="fa-brands fa-google"></i> Signed In`;
-                    signInBtn.classList.add('bg-gray-400');
-                    signInBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
-                    signInBtn.disabled = true;
-                    
-                    // Show loading text while fetching data
-                    container.innerHTML = '<p id="loading-text" class="text-center text-gray-500 col-span-full">Fetching workflow data...</p>';
-
-                    listenToWorkflowData();
-                } else {
-                    // User is signed out.
-                    currentUserId = null;
-                    workflowData = []; // Clear data on sign out
-                    render(); 
-                    
-                    signInBtn.innerHTML = `<i class="fa-brands fa-google"></i> Sign In`;
-                    signInBtn.classList.remove('bg-gray-400');
-                    signInBtn.classList.add('bg-red-600', 'hover:bg-red-700');
-                    signInBtn.disabled = false;
-                    
-                    // Show sign-in prompt
-                    container.innerHTML = '<p id="loading-text" class="text-center text-gray-500 col-span-full">Please sign in with Google to view your workflow.</p>';
-                    updateProgress(); // Ensure progress bar resets
-                }
-            });
-        }
-
-        function signInWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            
-            // FIX: Using signInWithRedirect to avoid pop-up blockers and session issues
-            auth.signInWithRedirect(provider)
-                .catch((error) => {
-                    console.error("Google Sign-in failed (Redirect):", error.message);
-                    alert("Sign-in failed: " + error.message);
-                });
-        }
-
-        function listenToWorkflowData() {
-            if (!currentUserId) return;
-
-            // Reference to the master document
-            const docRef = db.collection(DB_COLLECTION).doc(DB_DOCUMENT);
-
-            // Set up real-time listener
-            docRef.onSnapshot((docSnap) => {
+            unsubscribeData = onSnapshot(docRef, (docSnap) => {
                 const loadingText = document.getElementById('loading-text');
-                if (docSnap.exists) {
-                    // Data exists, load it
-                    // Note: Firestore data structure is docSnap.data().data
-                    workflowData = docSnap.data().data || defaultData;
-                    if (loadingText) loadingText.remove(); // Remove loading text once data is here
-                    render();
+                if (loadingText) loadingText.remove();
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    workflowData = data.items || defaultData;
                 } else {
-                    // No data for this document, save the default structure
-                    if (!workflowData.length) { // Only set defaults if state is empty
-                        workflowData = defaultData;
-                        save(); // Save the default data to Firestore
-                    }
+                    // First time user: set defaults
+                    workflowData = defaultData;
+                    saveData(); 
                 }
+                render();
             }, (error) => {
-                console.error("Error listening to database:", error);
-                document.getElementById('loading-text').textContent = 'Error loading data: ' + error.code;
+                console.error("Data fetch error:", error);
+                const container = document.getElementById('grid-container');
+                container.innerHTML = '<p class="text-red-500 text-center col-span-full">Error syncing data. Please refresh.</p>';
             });
         }
 
-        // --- MODIFIED SAVE FUNCTION ---
-        function save() {
-            if (!currentUserId) {
-                console.error("User not authenticated. Cannot save.");
-                return;
-            }
+        async function saveData() {
+            if (!currentUserId) return;
             
-            const docRef = db.collection(DB_COLLECTION).doc(DB_DOCUMENT);
-            // Overwrite the document with the new data array inside an object
-            docRef.set({ data: workflowData })
-                .catch((error) => {
-                    console.error("Error writing document: ", error);
-                });
-            // render() is called automatically by the real-time listener (onSnapshot)
+            const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'data', 'workflow');
+            try {
+                await setDoc(docRef, { items: workflowData });
+                updateProgress();
+            } catch (e) {
+                console.error("Save failed:", e);
+            }
         }
 
-        // --- CORE UI/DATA LOGIC ---
+        // --- UI Logic ---
+        
+        // Make functions available globally for onclick attributes
+        window.toggleTask = (dayIndex, taskIndex) => {
+            if (isEditMode) return;
+            workflowData[dayIndex].tasks[taskIndex].done = !workflowData[dayIndex].tasks[taskIndex].done;
+            saveData(); // Saves to Firestore, listener will update UI via render() (optimistic update handled by logic flow)
+            render();   // Immediate feedback
+        };
 
+        window.deleteTask = (dayIndex, taskIndex) => {
+            if (!confirm("Delete this task?")) return;
+            workflowData[dayIndex].tasks.splice(taskIndex, 1);
+            saveData();
+            render();
+        };
+
+        window.updateTaskText = (dayIndex, taskIndex, newText) => {
+            workflowData[dayIndex].tasks[taskIndex].text = newText;
+            saveData();
+        };
+
+        // Edit Mode Toggle
+        const editBtn = document.getElementById('edit-btn');
+        editBtn.addEventListener('click', () => {
+            isEditMode = !isEditMode;
+            const body = document.body;
+            const btnText = document.getElementById('edit-text');
+            
+            if (isEditMode) {
+                body.classList.add('edit-mode');
+                btnText.textContent = "Done Editing";
+                editBtn.classList.add('bg-yellow-100', 'border-yellow-300', 'text-yellow-800');
+                editBtn.classList.remove('bg-white', 'border-gray-300', 'text-gray-700');
+            } else {
+                body.classList.remove('edit-mode');
+                btnText.textContent = "Edit Tasks";
+                editBtn.classList.remove('bg-yellow-100', 'border-yellow-300', 'text-yellow-800');
+                editBtn.classList.add('bg-white', 'border-gray-300', 'text-gray-700');
+            }
+            render();
+        });
+
+        // Reset Week
+        const resetBtn = document.getElementById('reset-btn');
+        resetBtn.addEventListener('click', () => {
+            if(confirm("Start a new week? This will uncheck all tasks.")) {
+                workflowData.forEach(day => {
+                    day.tasks.forEach(task => task.done = false);
+                });
+                saveData();
+                render();
+            }
+        });
+
+        // --- Modal Logic ---
+        window.openAddModal = (dayIndex) => {
+            currentDayIndexForAdd = dayIndex;
+            const modal = document.getElementById('add-modal');
+            document.getElementById('new-task-input').value = '';
+            modal.showModal();
+            document.getElementById('new-task-input').focus();
+        };
+
+        document.getElementById('modal-cancel-btn').addEventListener('click', () => {
+            document.getElementById('add-modal').close();
+        });
+
+        document.getElementById('modal-add-btn').addEventListener('click', () => {
+            const input = document.getElementById('new-task-input');
+            const text = input.value.trim();
+            if (text && currentDayIndexForAdd !== null) {
+                workflowData[currentDayIndexForAdd].tasks.push({ text: text, done: false });
+                saveData();
+                render();
+                document.getElementById('add-modal').close();
+            }
+        });
+
+        // --- Helpers ---
         function updateDate() {
             const options = { weekday: 'long', month: 'long', day: 'numeric' };
-            const today = new Date();
-            document.getElementById('date-display').textContent = today.toLocaleDateString('en-US', options);
+            document.getElementById('date-display').textContent = new Date().toLocaleDateString('en-US', options);
         }
+        updateDate();
 
         function getIcon(text) {
             const t = text.toLowerCase();
@@ -323,109 +311,32 @@
         function updateProgress() {
             let total = 0;
             let completed = 0;
-            workflowData.forEach(day => {
-                day.tasks.forEach(task => {
-                    total++;
-                    if (task.done) completed++;
+            if(workflowData) {
+                workflowData.forEach(day => {
+                    day.tasks.forEach(task => {
+                        total++;
+                        if (task.done) completed++;
+                    });
                 });
-            });
-            
+            }
             const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
             document.getElementById('progress-fill').style.width = `${percent}%`;
             document.getElementById('progress-text').textContent = `${percent}% Complete`;
         }
 
-        function toggleTask(dayIndex, taskIndex) {
-            if (isEditMode) return;
-            workflowData[dayIndex].tasks[taskIndex].done = !workflowData[dayIndex].tasks[taskIndex].done;
-            save(); // Updates Firebase
-        }
-
-        function deleteTask(dayIndex, taskIndex) {
-            if (!confirm("Delete this task?")) return;
-            workflowData[dayIndex].tasks.splice(taskIndex, 1);
-            save(); // Updates Firebase
-        }
-
-        function openAddModal(dayIndex) {
-            currentDayIndexForAdd = dayIndex;
-            const modal = document.getElementById('add-modal');
-            document.getElementById('new-task-input').value = '';
-            modal.showModal();
-            document.getElementById('new-task-input').focus();
-        }
-
-        function closeModal() {
-            document.getElementById('add-modal').close();
-        }
-
-        function confirmAddTask() {
-            const input = document.getElementById('new-task-input');
-            const text = input.value.trim();
-            if (text && currentDayIndexForAdd !== null) {
-                workflowData[currentDayIndexForAdd].tasks.push({ text: text, done: false });
-                save(); // Updates Firebase
-                closeModal();
-            }
-        }
-
-        function updateTaskText(dayIndex, taskIndex, newText) {
-            workflowData[dayIndex].tasks[taskIndex].text = newText;
-            save(); // Updates Firebase
-        }
-
-        function toggleEditMode() {
-            if (!currentUserId) {
-                alert("Please sign in with Google to edit the tasks.");
-                return;
-            }
-            isEditMode = !isEditMode;
-            const body = document.body;
-            const btnText = document.getElementById('edit-text');
-            const btn = document.getElementById('edit-btn');
-            
-            if (isEditMode) {
-                body.classList.add('edit-mode');
-                btnText.textContent = "Done Editing";
-                btn.classList.add('bg-yellow-100', 'border-yellow-300', 'text-yellow-800');
-                btn.classList.remove('bg-white', 'border-gray-300', 'text-gray-700');
-            } else {
-                body.classList.remove('edit-mode');
-                btnText.textContent = "Edit Tasks";
-                btn.classList.remove('bg-yellow-100', 'border-yellow-300', 'text-yellow-800');
-                btn.classList.add('bg-white', 'border-gray-300', 'text-gray-700');
-            }
-            render();
-        }
-
-        function resetWeek() {
-            if (!currentUserId) {
-                alert("Please sign in with Google to reset the week.");
-                return;
-            }
-            if(confirm("Are you sure you want to start a new week? This will uncheck all tasks and update the shared database.")) {
-                workflowData.forEach(day => {
-                    day.tasks.forEach(task => {
-                        task.done = false;
-                    });
-                });
-                save(); // Updates Firebase
-            }
-        }
-
         function render() {
             const container = document.getElementById('grid-container');
             
-            // Only render the actual list if data is present
-            if (workflowData.length === 0) {
-                return;
+            // Prevent rendering if data isn't ready or empty
+            if (!workflowData || workflowData.length === 0) {
+                // If authenticated but no data yet (latency), wait.
+                // The snapshot listener handles the empty case by setting defaults.
+                return; 
             } 
             
-            // Clear the grid only when we have data to render
             container.innerHTML = ''; 
 
             workflowData.forEach((dayData, dayIndex) => {
-                // Calculate daily progress
                 const dayTotal = dayData.tasks.length;
                 const dayDone = dayData.tasks.filter(t => t.done).length;
                 const dayProgress = dayTotal === 0 ? 0 : (dayDone / dayTotal) * 100;
@@ -434,7 +345,6 @@
                 const card = document.createElement('div');
                 card.className = `bg-white rounded-xl shadow-sm border ${isComplete ? 'border-green-200 bg-green-50' : 'border-gray-200'} overflow-hidden flex flex-col transition-all duration-300 hover:shadow-md`;
 
-                // Card Header
                 const header = document.createElement('div');
                 header.className = `p-4 border-b ${isComplete ? 'border-green-100' : 'border-gray-100'} bg-opacity-50 ${dayData.color === 'indigo' ? 'bg-indigo-50' : dayData.color === 'purple' ? 'bg-purple-50' : 'bg-blue-50'}`;
                 header.innerHTML = `
@@ -451,7 +361,6 @@
                 `;
                 card.appendChild(header);
 
-                // Task List
                 const list = document.createElement('div');
                 list.className = 'p-4 flex-grow space-y-3';
 
@@ -461,7 +370,6 @@
                     
                     const iconClass = getIcon(task.text);
 
-                    // View Mode HTML
                     const viewHTML = `
                         <label class="checkbox-wrapper relative flex items-center cursor-pointer">
                             <input type="checkbox" class="sr-only" ${task.done ? 'checked' : ''} onchange="toggleTask(${dayIndex}, ${taskIndex})">
@@ -473,7 +381,6 @@
                         <span class="task-text text-sm text-gray-700 select-none flex-grow cursor-pointer" onclick="toggleTask(${dayIndex}, ${taskIndex})">${task.text}</span>
                     `;
 
-                    // Edit Mode HTML
                     const editHTML = `
                         <button onclick="deleteTask(${dayIndex}, ${taskIndex})" class="delete-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors">
                             <i class="fa-solid fa-trash"></i>
@@ -488,7 +395,6 @@
                     list.appendChild(item);
                 });
 
-                // Add Button (Only in Edit Mode)
                 const addBtn = document.createElement('button');
                 addBtn.className = 'add-btn w-full mt-2 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-400 text-sm hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50 transition-all items-center justify-center gap-2';
                 addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Task';
