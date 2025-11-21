@@ -98,15 +98,16 @@
 
     <!-- Firebase & App Logic -->
     <script type="module">
+        // Using CDN imports compatible with standalone HTML files
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Configuration ---
-        // Hardcoded configuration for standalone use
+        // UPDATED: Using your exact provided configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAd3taUTwf9AJv6M7RMvCWKlgw_pdqrRpM",
-            authDomain: "marketing.mechanicaltemp.com",
+            authDomain: "weekly-workflow-478915.firebaseapp.com", 
             projectId: "weekly-workflow-478915",
             storageBucket: "weekly-workflow-478915.firebasestorage.app",
             messagingSenderId: "1035427962286",
