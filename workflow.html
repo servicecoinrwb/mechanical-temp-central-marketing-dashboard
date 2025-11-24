@@ -82,10 +82,108 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow p-4 sm:p-6 lg:p-8">
+    <main class="flex-grow p-4 sm:p-6 lg:p-8 space-y-8">
+        
+        <!-- Weekly Grid -->
         <div id="grid-container" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             <p id="loading-text" class="text-center text-gray-500 col-span-full">Initializing secure connection...</p>
         </div>
+
+        <!-- Quarterly Compliance Section (Added) -->
+        <div class="max-w-7xl mx-auto">
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                <div class="bg-slate-800 p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-scale-balanced text-yellow-400"></i> Quarterly Compliance & Tax Routine
+                        </h2>
+                        <p class="text-slate-300 text-sm mt-1">Due: April 15, June 15, Sept 15, Jan 15</p>
+                    </div>
+                    <span class="bg-yellow-500/20 text-yellow-300 border border-yellow-500/50 px-3 py-1 rounded-full text-xs font-semibold">Reference Guide</span>
+                </div>
+                
+                <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Left: The Quarterly Checklist -->
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                            <h3 class="font-bold text-blue-900 mb-2">The "Who Does What" Split</h3>
+                            <ul class="text-sm text-blue-800 space-y-2">
+                                <li class="flex items-start gap-2"><i class="fa-solid fa-building-columns mt-1"></i> <span><strong>Payroll Company:</strong> Handles Employees (SS, Medicare, Withholding, Unemployment).</span></li>
+                                <li class="flex items-start gap-2"><i class="fa-solid fa-user-tie mt-1"></i> <span><strong>You (Bookkeeper Pro):</strong> Handle Owner Income Tax (Profit) & Sales Tax.</span></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-gray-800 mb-3 border-b pb-2">Your 3-Step Quarterly Routine</h3>
+                            <div class="space-y-4">
+                                <div class="flex gap-4">
+                                    <div class="flex-shrink-0 w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-600 border border-slate-300">1</div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">The "Employee" Step (5 Mins)</h4>
+                                        <p class="text-sm text-gray-600 mt-1">Log in to Payroll Portal. Download "Quarterly Package" (Form 941 & State Unemployment). Save to "2025 Tax Documents" folder.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="flex-shrink-0 w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-600 border border-slate-300">2</div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">The "Owner" Step (15 Mins)</h4>
+                                        <p class="text-sm text-gray-600 mt-1">Open Bookkeeper Pro > Taxes Tab > "Quarterly Payment Estimates".</p>
+                                        <p class="text-sm text-gray-600 mt-1">Go to <a href="https://www.irs.gov/payments/direct-pay" target="_blank" class="text-blue-600 underline">IRS Direct Pay</a>. Select "Estimated Tax (1040-ES)". Pay the amount shown.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="flex-shrink-0 w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-600 border border-slate-300">3</div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">The "Sales Tax" Step</h4>
+                                        <p class="text-sm text-gray-600 mt-1">Open Bookkeeper Pro > Reports > P&L > Look at "Income". Log into State Treasury, enter Total Sales, and pay the calculated tax.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: The Weekly Maintenance Guide -->
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-wrench text-gray-400"></i> How to Maintain Accuracy</h3>
+                        <p class="text-sm text-gray-600 mb-4">To ensure Step 2 is accurate, perform this routine every Friday:</p>
+                        
+                        <div class="space-y-3">
+                            <div class="p-3 bg-white rounded border border-gray-200 shadow-sm">
+                                <span class="text-xs font-bold text-indigo-600 uppercase tracking-wide">Action</span>
+                                <p class="text-sm text-gray-800">Download CSV from Bank -> Drag into Bookkeeper Pro.</p>
+                            </div>
+                            
+                            <div class="p-3 bg-white rounded border border-gray-200 shadow-sm">
+                                <span class="text-xs font-bold text-green-600 uppercase tracking-wide">Categorization Cheat Sheet</span>
+                                <ul class="mt-2 space-y-2 text-sm text-gray-700">
+                                    <li class="flex justify-between border-b border-gray-100 pb-1">
+                                        <span>Employee Paychecks</span>
+                                        <span class="font-medium text-gray-900">"Paycheck" (Expense)</span>
+                                    </li>
+                                    <li class="flex justify-between border-b border-gray-100 pb-1">
+                                        <span>Payroll Fees</span>
+                                        <span class="font-medium text-gray-900">"Professional Fees"</span>
+                                    </li>
+                                    <li class="flex justify-between border-b border-gray-100 pb-1">
+                                        <span>Parts/Fuel</span>
+                                        <span class="font-medium text-gray-900">Normal Expenses</span>
+                                    </li>
+                                    <li class="flex justify-between border-b border-gray-100 pb-1">
+                                        <span>Money to You</span>
+                                        <span class="font-medium text-gray-900">"Owner's Draw" (Equity)</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span>Loan Payments</span>
+                                        <span class="font-medium text-gray-900">"Transfer"</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- Footer -->
