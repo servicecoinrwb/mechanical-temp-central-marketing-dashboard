@@ -305,7 +305,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-        import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
         // --- Configuration ---
         // UPDATED WITH API KEY 1 (AIzaSyA6r8v7Bx3w7K4DnpOITjN268tMRxjWgPw)
@@ -365,8 +365,7 @@
         signOutBtn.addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                // On signout, try anon login to keep app visible but read-only/empty
-                signInAnonymously(auth).catch(() => {}); 
+                // NOTE: Removed anonymous sign-in here to prevent error
             } catch (error) {
                 console.error("Error signing out:", error);
             }
@@ -380,19 +379,14 @@
             if (user) {
                 currentUserId = user.uid;
                 
-                // Update UI based on whether user is Anonymous or Google
-                if (user.isAnonymous) {
-                    signInBtn.classList.remove('hidden');
-                    userProfile.classList.add('hidden');
-                } else {
-                    signInBtn.classList.add('hidden');
-                    userProfile.classList.remove('hidden');
-                    userProfile.classList.add('flex');
-                    userEmailSpan.textContent = user.email || "User";
-                    userAvatar.textContent = (user.email || "U")[0].toUpperCase();
-                    if (user.photoURL) {
-                        userAvatar.innerHTML = `<img src="${user.photoURL}" class="w-full h-full rounded-full" alt="Profile">`;
-                    }
+                // User Logged In: Hide Sign In, Show Profile
+                signInBtn.classList.add('hidden');
+                userProfile.classList.remove('hidden');
+                userProfile.classList.add('flex');
+                userEmailSpan.textContent = user.email || "User";
+                userAvatar.textContent = (user.email || "U")[0].toUpperCase();
+                if (user.photoURL) {
+                    userAvatar.innerHTML = `<img src="${user.photoURL}" class="w-full h-full rounded-full" alt="Profile">`;
                 }
 
                 editBtn.disabled = false;
@@ -401,8 +395,19 @@
                 // Load data immediately after auth
                 setupDataListener(user.uid);
             } else {
-                // If no user at all, try anonymous login to at least show the app
-                signInAnonymously(auth).catch(console.error);
+                // User Logged Out: Show Sign In Button, Hide Profile
+                console.log("User is signed out.");
+                signInBtn.classList.remove('hidden');
+                userProfile.classList.add('hidden');
+                
+                // Clear any listeners
+                if (unsubscribeData) {
+                    unsubscribeData();
+                    unsubscribeData = null;
+                }
+                // Reset controls
+                editBtn.disabled = true;
+                resetBtn.disabled = true;
             }
         });
 
