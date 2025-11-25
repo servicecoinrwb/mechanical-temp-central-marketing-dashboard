@@ -308,15 +308,15 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
         // --- Configuration ---
-        // UPDATED WITH API KEY 1 (AIzaSyA6r8v7Bx3w7K4DnpOITjN268tMRxjWgPw)
+        // UPDATED TO MATCH YOUR NEW FIREBASE PROJECT (weekly-workflow-478915)
         const firebaseConfig = {
-             apiKey: "AIzaSyA6r8v7Bx3w7K4DnpOITjN268tMRxjWgPw", 
-             authDomain: "gen-lang-client-0527243008.firebaseapp.com",
-             projectId: "gen-lang-client-0527243008",
-             storageBucket: "gen-lang-client-0527243008.firebasestorage.app",
-             messagingSenderId: "364776086784",
-             appId: "1:364776086784:web:5fff5cf8938440e6bb27e5",
-             measurementId: "G-353V9E57VG"
+             apiKey: "AIzaSyB6nkbhhv_2O6OIWP-ssaJyF7wy3-uQa3Y", 
+             authDomain: "weekly-workflow-478915.firebaseapp.com",
+             projectId: "weekly-workflow-478915",
+             storageBucket: "weekly-workflow-478915.firebasestorage.app",
+             messagingSenderId: "1035427962286",
+             appId: "1:1035427962286:web:2e23291d8926bed94f3c3f",
+             measurementId: "G-8SRKJDSDX3"
         };
         
         // UNIQUE ID for this specific app
@@ -365,7 +365,7 @@
         signOutBtn.addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                // NOTE: Removed anonymous sign-in here to prevent error
+                // No anonymous login needed
             } catch (error) {
                 console.error("Error signing out:", error);
             }
@@ -379,7 +379,7 @@
             if (user) {
                 currentUserId = user.uid;
                 
-                // User Logged In: Hide Sign In, Show Profile
+                // User is signed in: Hide button, show profile
                 signInBtn.classList.add('hidden');
                 userProfile.classList.remove('hidden');
                 userProfile.classList.add('flex');
@@ -395,10 +395,19 @@
                 // Load data immediately after auth
                 setupDataListener(user.uid);
             } else {
-                // User Logged Out: Show Sign In Button, Hide Profile
+                // User is signed out: Show button, hide profile
                 console.log("User is signed out.");
                 signInBtn.classList.remove('hidden');
                 userProfile.classList.add('hidden');
+                
+                // Update the grid area to prompt for login
+                const container = document.getElementById('grid-container');
+                container.innerHTML = `
+                    <div class="col-span-full text-center p-10">
+                        <p class="text-gray-500 text-lg mb-4">Please sign in to view your secure workflow.</p>
+                        <p class="text-sm text-gray-400">Click the "Sign In" button in the top right corner.</p>
+                    </div>
+                `;
                 
                 // Clear any listeners
                 if (unsubscribeData) {
@@ -424,6 +433,7 @@
             const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'workflow');
 
             unsubscribeData = onSnapshot(docRef, (docSnap) => {
+                // Clear loading text if it exists
                 const loadingText = document.getElementById('loading-text');
                 if (loadingText) loadingText.remove();
 
@@ -437,7 +447,7 @@
             }, (error) => {
                 console.error("Data fetch error:", error);
                 const container = document.getElementById('grid-container');
-                container.innerHTML = '<p class="text-red-500 text-center col-span-full">Error syncing data. If you just switched accounts, please refresh.</p>';
+                container.innerHTML = '<p class="text-red-500 text-center col-span-full">Error syncing data. Please check your internet connection or permissions.</p>';
             });
         }
 
