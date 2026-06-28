@@ -91,6 +91,9 @@
                 </div>
 
                 <div class="flex flex-wrap justify-end gap-2">
+                    <a href="https://mtobserver.digitalsecretarymachine.com" target="_blank" class="bg-white text-[#1A2D4E] font-bold py-2 px-3 rounded-lg transition text-sm hover:bg-gray-100 ring-2 ring-sky-400">DSM</a>
+                    <a href="https://mtobserver.digitalsecretarymachine.com/local" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Local Scoreboard</a>
+                    <a href="https://mtobserver.digitalsecretarymachine.com/marketing-brief" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Marketing Brief</a>
                     <a href="./lead-funnel.html" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Lead Funnel</a>
                     <a href="./Weekly-Cross-Promotion-Planner.html" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Planner</a>
                     <a href="https://servicecoinrwb.github.io/Blog-Post-Generator/" target="_blank" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-3 rounded-lg transition text-sm">Blog Gen</a>
@@ -161,7 +164,7 @@
                         <div class="space-y-2">
                              <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-1" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-1" class="ml-3 text-gray-700">High-Converting Landing Page Live</label></div>
                              <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-2" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-2" class="ml-3 text-gray-700">Conversion Tracking Installed</label></div>
-                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-3" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-3" class="ml-3 text-gray-700">LSA Campaign Paused to focus budget</label></div>
+                             <div class="task-item flex items-center"><input type="checkbox" id="task-foundation-3" class="h-4 w-4 rounded task-checkbox"><label for="task-foundation-3" class="ml-3 text-gray-700">LSA active for cooling season (AC job types set)</label></div>
                         </div>
                          <h3 class="text-xl font-semibold mt-6 mb-2">B. Active Campaign Management (Weekly Tasks)</h3>
                         <div class="space-y-2">
@@ -229,9 +232,44 @@
                 </div>
 
                 <div class="dashboard-card">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold mb-4">🔗 CDN Link Builder</h2>
+                        <p class="text-gray-600 text-sm mb-3">Paste an asset path, filename, or full URL. Outputs a properly encoded <span class="font-mono text-xs bg-gray-100 px-1 py-0.5 rounded">cdn.mechanicaltemp.com</span> link.</p>
+
+                        <label for="cdn-src" class="block text-xs font-semibold text-gray-500 mb-1">Asset path or filename</label>
+                        <input id="cdn-src" type="text" spellcheck="false" autocomplete="off" value="mt-post/mt-post-ba-2026-06-14 (1).png" class="w-full p-2 border rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+
+                        <div class="mt-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-semibold text-gray-500">CDN URL <span class="font-normal text-gray-400">— matches the file as named</span></span>
+                                <button id="cdn-copy1" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-1 px-3 rounded-lg transition">Copy</button>
+                            </div>
+                            <div id="cdn-out1" class="font-mono text-xs break-all bg-gray-50 border rounded-lg p-2 text-blue-700 min-h-[2rem]"></div>
+                        </div>
+
+                        <div id="cdn-clean-row" class="mt-3 hidden">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-semibold text-gray-500">Cleaned URL <span class="font-normal text-gray-400">— only if you rename the file</span></span>
+                                <button id="cdn-copy2" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold py-1 px-3 rounded-lg transition">Copy</button>
+                            </div>
+                            <div id="cdn-out2" class="font-mono text-xs break-all bg-gray-50 border rounded-lg p-2 text-gray-600 min-h-[2rem]"></div>
+                        </div>
+
+                        <div id="cdn-preview-wrap" class="mt-3 hidden">
+                            <span class="text-xs font-semibold text-gray-500">Preview</span>
+                            <div class="mt-1 bg-gray-50 border rounded-lg p-2 flex items-center justify-center min-h-[60px]">
+                                <img id="cdn-preview" alt="asset preview" class="max-w-full max-h-56 rounded hidden">
+                                <span id="cdn-preview-msg" class="text-xs text-gray-400">loading…</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
                         <div class="p-6">
                             <h2 class="text-2xl font-bold mb-4">Pillar 2: Off-Page SEO (Local)</h2>
                             <h3 class="text-xl font-semibold mb-2">A. Google Business Profile (Weekly)</h3>
+                            <p class="text-xs text-gray-500 mb-2">📊 DSM pulls GBP performance nightly — check the <a href="https://mtobserver.digitalsecretarymachine.com/local" target="_blank" class="text-emerald-600 hover:underline font-semibold">Local Scoreboard</a> for views, calls &amp; direction requests.</p>
                             <div class="space-y-2">
                                 <div class="task-item flex items-center justify-between">
                                     <div class="flex items-center">
@@ -260,7 +298,7 @@
                             </div>
                             <h3 class="text-xl font-semibold mt-6 mb-2">B. How-To Guides & Summaries</h3>
                             <div class="text-sm text-gray-600">
-                               <p><strong>How to Check for Crawl Errors:</strong><br> 1. Go to Google Search Console (GSC). <br>2. In the left menu, click 'Indexing' > 'Pages'. <br>3. Scroll down to the "Why pages aren't indexed" section. <br>4. Look for "Not found (404)" errors. If important pages are listed, set up a redirect in Squarespace.</p>
+                               <p><strong>How to Check for Crawl Errors:</strong><br> 1. Go to Google Search Console (GSC). <br>2. In the left menu, click 'Indexing' > 'Pages'. <br>3. Scroll down to the "Why pages aren't indexed" section. <br>4. Look for "Not found (404)" errors. If important pages are listed, fix the link in the site repo or add a Cloudflare redirect rule (site is on GitHub Pages now, not Squarespace).</p>
                             </div>
                        </div>
                 </div>
@@ -280,12 +318,13 @@
                 </div>
                  <div class="dashboard-card">
                        <div class="p-6">
-                            <h2 class="text-2xl font-bold mb-4">🎯 Q4 2025 Goals</h2>
+                            <h2 class="text-2xl font-bold mb-4">🎯 Q3 2026 Goals (Cooling Season)</h2>
                             <ul class="list-disc list-inside space-y-2 text-gray-700">
-                               <li>Publish 2 new blog posts.</li>
-                               <li>Generate 15 qualified leads from Google Ads.</li>
-                               <li>Achieve a Cost Per Lead of under $75.</li>
+                               <li>Keep AC repair / install LSA + Search at a Cost Per Lead under $75.</li>
+                               <li>Generate 15 qualified cooling-season leads from Google Ads.</li>
+                               <li>Post 2x/week to GBP &amp; Facebook via the Post Builder.</li>
                                <li>Generate 10 new 5-star reviews on Google.</li>
+                               <li>Publish 2 new blog posts (AC / summer comfort topics).</li>
                             </ul>
                        </div>
                 </div>
@@ -561,6 +600,97 @@
 
             setupEventListeners();
         });
+    </script>
+
+    <!-- CDN LINK BUILDER (standalone, no persistence needed) -->
+    <script>
+    (function(){
+      var BASE = "https://cdn.mechanicaltemp.com/";
+      var IMG = /\.(png|jpe?g|gif|webp|svg|avif|bmp)$/i;
+      var src = document.getElementById('cdn-src');
+      if(!src) return;
+      var out1 = document.getElementById('cdn-out1');
+      var out2 = document.getElementById('cdn-out2');
+      var cleanRow = document.getElementById('cdn-clean-row');
+      var previewWrap = document.getElementById('cdn-preview-wrap');
+      var preview = document.getElementById('cdn-preview');
+      var previewMsg = document.getElementById('cdn-preview-msg');
+
+      function dec(s){ try { return decodeURIComponent(s); } catch(e){ return s; } }
+
+      function toRel(raw){
+        var s = (raw||'').trim();
+        if(!s) return '';
+        s = s.replace(/^https?:\/\/cdn\.mechanicaltemp\.com\//i, '');
+        s = s.replace(/^\/+/, '');
+        return s;
+      }
+
+      function encodeURL(raw){
+        var s = toRel(raw);
+        if(!s) return '';
+        return BASE + s.split('/').map(function(seg){ return encodeURIComponent(dec(seg)); }).join('/');
+      }
+
+      function cleanURL(raw){
+        var s = toRel(raw);
+        if(!s) return '';
+        var segs = s.split('/');
+        var file = segs.pop();
+        var dot = file.lastIndexOf('.');
+        var name = dot > 0 ? file.slice(0, dot) : file;
+        var ext  = dot > 0 ? file.slice(dot).toLowerCase() : '';
+        name = dec(name).toLowerCase()
+          .replace(/\s*\(\d+\)\s*$/, '')
+          .replace(/[^a-z0-9._-]+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-+|-+$/g, '');
+        segs.push(name + ext);
+        return BASE + segs.join('/');
+      }
+
+      function render(){
+        var enc = encodeURL(src.value);
+        var cln = cleanURL(src.value);
+        out1.textContent = enc || '—';
+        if(cln && cln !== enc){
+          out2.textContent = cln;
+          cleanRow.classList.remove('hidden');
+        } else {
+          cleanRow.classList.add('hidden');
+        }
+        var rel = toRel(src.value);
+        if(IMG.test(rel)){
+          previewWrap.classList.remove('hidden');
+          preview.classList.add('hidden');
+          previewMsg.style.display = 'block';
+          previewMsg.textContent = 'loading…';
+          preview.onload = function(){ preview.classList.remove('hidden'); previewMsg.style.display = 'none'; };
+          preview.onerror = function(){ preview.classList.add('hidden'); previewMsg.style.display = 'block'; previewMsg.textContent = "couldn't load — file may not be live on the CDN yet"; };
+          preview.src = enc;
+        } else {
+          previewWrap.classList.add('hidden');
+          preview.removeAttribute('src');
+        }
+      }
+
+      function copy(text, btn){
+        var label = btn.textContent;
+        var done = function(){ btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = label; }, 1400); };
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(text).then(done, done);
+        } else {
+          var t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select();
+          try { document.execCommand('copy'); } catch(e){}
+          document.body.removeChild(t); done();
+        }
+      }
+
+      src.addEventListener('input', render);
+      document.getElementById('cdn-copy1').addEventListener('click', function(){ copy(out1.textContent, this); });
+      document.getElementById('cdn-copy2').addEventListener('click', function(){ copy(out2.textContent, this); });
+      render();
+    })();
     </script>
 </body>
 </html>
