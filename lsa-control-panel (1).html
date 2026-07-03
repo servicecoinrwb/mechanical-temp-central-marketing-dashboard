@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LSA Control Panel — Mechanical Temp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#10161B; --panel:#182128; --panel2:#141B21; --line:#26323B;
+    --txt:#DCE6EC; --dim:#7E919D; --faint:#54646F;
+    --amber:#FFAE1A; --cyan:#3FD2C7; --red:#FF5A5A;
+    --mono:'IBM Plex Mono',monospace; --sans:'Archivo',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-weight:500;line-height:1.55;padding:0 16px 80px}
+  .wrap{max-width:880px;margin:0 auto}
+
+  header{padding:42px 0 10px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--faint);text-transform:uppercase}
+  h1{font-weight:900;font-size:clamp(30px,6vw,46px);letter-spacing:-.02em;line-height:1.05;margin:8px 0 6px}
+  h1 .amber{color:var(--amber)}
+  .sub{color:var(--dim);max-width:60ch}
+
+  section{margin-top:44px}
+  h2{font-weight:900;font-size:clamp(20px,3.5vw,26px);letter-spacing:-.01em;margin-bottom:4px}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--amber);text-transform:uppercase;margin-bottom:10px}
+  p.lead{color:var(--dim);margin-bottom:18px;max-width:66ch}
+
+  /* three numbers */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:720px){.cards{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 16px;position:relative}
+  .card .tag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:10px}
+  .tag.lies{background:rgba(255,90,90,.12);color:var(--red)}
+  .tag.soft{background:rgba(255,174,26,.12);color:var(--amber)}
+  .tag.real{background:rgba(63,210,199,.12);color:var(--cyan)}
+  .card h3{font-size:15px;font-weight:700;margin-bottom:6px}
+  .card .big{font-family:var(--mono);font-size:26px;font-weight:600;margin:4px 0 8px}
+  .card p{font-size:13.5px;color:var(--dim)}
+  .card p strong{color:var(--txt)}
+
+  /* panel */
+  .board{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px;margin-top:16px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+
+  label.ctl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:16px 0 6px}
+  label.ctl:first-child{margin-top:0}
+  .val{color:var(--txt);font-weight:600;float:right}
+
+  input[type=range]{width:100%;appearance:none;height:6px;border-radius:3px;background:var(--line);outline:none}
+  input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;border-radius:50%;background:var(--cyan);border:3px solid var(--bg);cursor:pointer}
+  input[type=range].heat::-webkit-slider-thumb{background:var(--amber)}
+  input[type=range].heat{background:linear-gradient(90deg,#3D7BD9,#2b6f8a,#3d4a44,#8a6a2b,#b3401f)}
+
+  select,input[type=number]{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:6px;color:var(--txt);font-family:var(--mono);font-size:14px;padding:9px 10px}
+  .modes{display:flex;gap:8px}
+  .modes button{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:6px;color:var(--dim);font-family:var(--mono);font-size:12px;padding:10px 6px;cursor:pointer;letter-spacing:.04em}
+  .modes button.on{border-color:var(--cyan);color:var(--cyan);background:rgba(63,210,199,.07)}
+  .modes button.on.bot{border-color:var(--red);color:var(--red);background:rgba(255,90,90,.07)}
+
+  /* demand dial readout */
+  .dial{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+  .dial .deg{font-family:var(--mono);font-size:44px;font-weight:600;color:var(--amber);letter-spacing:-.02em}
+  .dial .lbl{font-family:var(--mono);font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.12em}
+  .clearing{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:8px}
+  .clearing b{color:var(--amber);font-size:15px}
+
+  /* outputs */
+  .outs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+  @media(max-width:720px){.outs{grid-template-columns:repeat(2,1fr)}}
+  .out{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px}
+  .out .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+  .out .v{font-family:var(--mono);font-size:21px;font-weight:600;margin-top:4px}
+  .out .n{font-size:11.5px;color:var(--dim);margin-top:3px}
+  .v.good{color:var(--cyan)} .v.bad{color:var(--red)} .v.warn{color:var(--amber)}
+
+  .race{margin-top:14px;border-radius:8px;padding:14px 16px;font-family:var(--mono);font-size:13px;border:1px solid var(--line)}
+  .race.in{border-color:rgba(63,210,199,.5);color:var(--cyan);background:rgba(63,210,199,.06)}
+  .race.out{border-color:rgba(255,174,26,.5);color:var(--amber);background:rgba(255,174,26,.06)}
+  .race.bleed{border-color:rgba(255,90,90,.5);color:var(--red);background:rgba(255,90,90,.06)}
+
+  .verdict{margin-top:12px;padding:16px;border-radius:8px;background:var(--panel2);border-left:3px solid var(--cyan);font-size:14px}
+  .verdict.danger{border-left-color:var(--red)}
+  .verdict.caution{border-left-color:var(--amber)}
+  .verdict b{font-family:var(--mono)}
+
+  /* presets */
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .presets button{background:var(--panel);border:1px solid var(--line);border-radius:20px;color:var(--dim);font-family:var(--mono);font-size:12px;padding:8px 14px;cursor:pointer}
+  .presets button:hover{border-color:var(--cyan);color:var(--cyan)}
+
+  /* rules */
+  ol.rules{list-style:none;counter-reset:r;margin-top:14px}
+  ol.rules li{counter-increment:r;padding:14px 0 14px 52px;border-top:1px solid var(--line);position:relative;color:var(--dim);font-size:14.5px}
+  ol.rules li::before{content:counter(r,decimal-leading-zero);position:absolute;left:0;top:14px;font-family:var(--mono);color:var(--amber);font-size:13px}
+  ol.rules li b{color:var(--txt)}
+
+  footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Mechanical Temp · Internal · Not Google's version of events</div>
+  <h1>LSA <span class="amber">Control Panel</span></h1>
+  <p class="sub">How the machine actually bills, prices, and throttles — and a simulator to set the knobs by math instead of by Google's suggestions.</p>
+</header>
+
+<section>
+  <div class="kicker">Part 1 — The three numbers</div>
+  <h2>Only one of these is real</h2>
+  <p class="lead">Three different dollar figures live in the account. They look like the same kind of number. They are not.</p>
+  <div class="cards">
+    <div class="card">
+      <span class="tag lies">Does nothing</span>
+      <h3>Payment threshold</h3>
+      <div class="big" id="c-thr">$500</div>
+      <p>A <strong>billing trigger</strong>: "swipe the card every time the tab hits this." It never pauses the ad, never limits spend. You can blow past it mid-morning and still receive leads — <strong>because it isn't connected to ad serving at all.</strong></p>
+    </div>
+    <div class="card">
+      <span class="tag soft">A suggestion</span>
+      <h3>"Average" weekly budget</h3>
+      <div class="big" id="c-wk">$560</div>
+      <p>The word <strong>average</strong> is the loophole. Google may spend well past it in a hot week — front-loading your month into the exact days leads cost the most — as long as the month stays under the max.</p>
+    </div>
+    <div class="card">
+      <span class="tag real">The only wall</span>
+      <h3>Monthly max</h3>
+      <div class="big" id="c-mo">$2,425</div>
+      <p>Weekly budget × ~4.33. <strong>This is the only number that stops the ad.</strong> Every other control is theater. To set a real ceiling: decide your worst-case month, divide by 4.33, put that in the weekly box.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="kicker">Part 2 — The simulator</div>
+  <h2>Price the race before you enter it</h2>
+  <p class="lead">Demand isn't a season — it's distance from mild. Dead furnaces at 5° and dead condensers at 95° both crank the auction; the 60s are when phones sleep and leads go cheap. Drag the outdoor temp across the whole year and watch the market reprice.</p>
+
+  <div class="board">
+    <div class="dial">
+      <span class="deg" id="deg">95°</span>
+      <span class="lbl" id="deglbl">Heat wave · demand frenzy</span>
+    </div>
+    <input type="range" class="heat" id="demand" min="0" max="100" value="95">
+    <div class="clearing">Auction clearing price right now ≈ <b id="clr">$89</b> per lead · <span id="pot">~28</span> LSA leads/week in your area</div>
+
+    <div class="grid2" style="margin-top:22px">
+      <div>
+        <label class="ctl">Bidding mode</label>
+        <div class="modes">
+          <button id="m-bot" class="on bot">MAXIMIZE LEADS<br><span style="font-size:10px;opacity:.7">Google's bot spends</span></button>
+          <button id="m-man">MAX PER LEAD<br><span style="font-size:10px;opacity:.7">You set the price</span></button>
+        </div>
+
+        <label class="ctl">Max per lead (manual only) <span class="val" id="bidv">$60</span></label>
+        <input type="range" id="bid" min="20" max="120" value="60" step="5">
+
+        <label class="ctl">Weekly budget <span class="val" id="wkv">$560</span></label>
+        <input type="range" id="wk" min="100" max="1200" value="560" step="10">
+      </div>
+      <div>
+        <label class="ctl">Truck capacity right now</label>
+        <select id="cap">
+          <option value="0.40">Same-day slots open — win ~40% of races</option>
+          <option value="0.25" selected>Next-day only — win ~25%</option>
+          <option value="0.10">Booked 2+ days out — win ~10%</option>
+        </select>
+
+        <label class="ctl">Avg gross profit per won demand call ($)</label>
+        <input type="number" id="gp" value="350" min="50" step="25">
+
+        <label class="ctl">What a lead is worth to you right now</label>
+        <div class="out" style="margin-top:2px"><div class="k">Win rate × gross profit</div><div class="v warn" id="lval">$88</div><div class="n">Pay less than this per lead or you're donating.</div></div>
+      </div>
+    </div>
+
+    <div class="race bleed" id="race">● IN EVERY RACE, AT ANY PRICE — the bot never sits out; it just pays whatever the frenzy asks.</div>
+
+    <div class="outs">
+      <div class="out"><div class="k">Your cost per lead</div><div class="v" id="cpl">$89</div><div class="n" id="cpln">Bot pays market</div></div>
+      <div class="out"><div class="k">Leads / week</div><div class="v" id="lw">~14</div><div class="n" id="lwn"></div></div>
+      <div class="out"><div class="k">Weekly spend</div><div class="v" id="sp">$1,250</div><div class="n" id="spn"></div></div>
+      <div class="out"><div class="k">Cost per booked job</div><div class="v" id="cbj">$356</div><div class="n">CPL ÷ win rate — the real acquisition cost</div></div>
+      <div class="out"><div class="k">Jobs won / week</div><div class="v" id="jw">3.5</div><div class="n"></div></div>
+      <div class="out"><div class="k">Weekly net from LSA</div><div class="v" id="net">−$25</div><div class="n">Gross profit on wins − ad spend</div></div>
+    </div>
+
+    <div class="verdict" id="verdict"></div>
+
+    <div class="presets">
+      <button data-p="now">▶ This week (what actually happened)</button>
+      <button data-p="tq">▶ Tourniquet</button>
+      <button data-p="slow">▶ Shoulder-season offense</button>
+      <button data-p="winter">▶ January deep freeze</button>
+      <button data-p="full">▶ Booked solid</button>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="kicker">Part 3 — Pricing the toll into the ticket</div>
+  <h2>The lead charge lives in every job now</h2>
+  <p class="lead">The three lost races get paid for by the one you win. So the winning ticket has to carry them. This derives your minimums from the same numbers driving the bid — change the simulator above and this section reprices.</p>
+
+  <div class="board">
+    <div class="grid2">
+      <div>
+        <label class="ctl">Truck roll cost — drive + diagnose ($) <span class="val" id="trv">$120</span></label>
+        <input type="range" id="tr" min="60" max="220" value="120" step="5">
+        <label class="ctl">Target margin on smallest repair ($)</label>
+        <input type="number" id="mg" value="80" min="0" step="10">
+      </div>
+      <div>
+        <div class="out" style="margin-bottom:10px"><div class="k">Acquisition cost per booked LSA job</div><div class="v warn" id="cac">$260</div><div class="n">Your bid ÷ win rate — pulled live from the simulator above</div></div>
+        <div class="out"><div class="k">Minimum on any completed demand-call repair</div><div class="v" id="floor" style="font-size:28px">$460</div><div class="n">CAC + truck roll + margin. "It was just a wire" is priced here — the diagnosis speed is the product, the wire is incidental.</div></div>
+      </div>
+    </div>
+
+    <div class="outs" style="grid-template-columns:repeat(3,1fr)">
+      <div class="out"><div class="k">Trip / decline fee</div><div class="v" id="trip">$189</div><div class="n">They said no to the repair. Covers the roll + a little. The converts subsidize the declines — that's the bet the no-quote phone strategy makes.</div></div>
+      <div class="out"><div class="k">Level 1 repair floor</div><div class="v good" id="l1">$460</div><div class="n">Wire splice, capacitor, flame sensor, condensate switch — every 20-minute fix books at this line or above. Printed in the book. Nobody negotiates with a book.</div></div>
+      <div class="out"><div class="k">Danger zone</div><div class="v bad" id="dz">&lt; $380</div><div class="n">A "repair" priced under CAC + roll feels like a win and nets negative. The $240 capacitor swap on a Google lead is the silent killer, not the decline.</div></div>
+    </div>
+
+    <div class="verdict" id="pverdict" style="margin-top:14px"></div>
+  </div>
+
+  <h3 style="font-weight:700;font-size:16px;margin:26px 0 10px">Who carries the toll — and who doesn't</h3>
+  <div class="cards">
+    <div class="card">
+      <span class="tag lies">Full toll</span>
+      <h3>LSA / Google-sourced</h3>
+      <p>First-time stranger. Carries the <strong>full CAC</strong> in the floor above. But it's the only channel where the toll is paid <strong>once</strong> — magnet on the invoice, "save this number" text, review ask, spring tuneup reminder from DSM. Every saved contact is de-platformed revenue.</p>
+    </div>
+    <div class="card">
+      <span class="tag soft">No toll, no customer</span>
+      <h3>FM / national accounts</h3>
+      <p>Zero lead cost — price per contract, not per this page. But the customer is <strong>structurally theirs forever</strong>. Same middleman physics as Google, paid in margin compression and slow pay instead of tolls. Never let FM rates anchor demand-call pricing.</p>
+    </div>
+    <div class="card">
+      <span class="tag real">The ratchet</span>
+      <h3>Repeat / direct</h3>
+      <p>CAC = $0. The saved contact who skips Google next time. Price with relationship flex if you want — every job here is one the toll never touches. Growing this column is the only long-term price cut the machine allows.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="kicker">Part 4 — The playbook</div>
+  <h2>Rules of the rigged game</h2>
+  <ol class="rules">
+    <li><b>The threshold protects nothing.</b> It's a card-swipe trigger. Set it LOW ($50–100) so charges hit the bank often — an early-warning system, not a wall.</li>
+    <li><b>Weekly budget × 4.33 is your real ceiling.</b> Decide the worst month you'd tolerate, divide by 4.33, enter that. When it's spent the ad goes dark — the only true off switch besides Pause.</li>
+    <li><b>Maximize Leads = Google's bot spends your money at frenzy prices.</b> "Performing well — increase your budget" appears exactly when you should do the opposite. Manual Max per lead turns a slot machine back into a price tag.</li>
+    <li><b>A lead is worth win-rate × gross profit — and win rate moves with your schedule.</b> Same lead, same price: worth ~$140 with same-day slots, ~$35 when booked solid. Reprice your bid when your board changes, not when Google suggests it.</li>
+    <li><b>Spend backwards from instinct.</b> Heat wave = cap low, budget low (demand finds you anyway; the auction is gouging). Dead week = cap up, budget up (cheap leads, open trucks, races you'll win).</li>
+    <li><b>Job-type labels are noise.</b> Panicking people tap whatever button is near their thumb. "Maintenance" leads were service calls. Don't filter on Google's taxonomy — filter on price and capacity.</li>
+    <li><b>The whole funnel is a ranked list and a phone.</b> Customers never leave the Google page. Win the phone in 60 seconds, quote a real arrival window, text when the truck rolls. The other 14 bookings quietly die when you feel like the sure thing.</li>
+    <li><b>Reviews are the only free rank.</b> Quality score lifts position and cuts effective CPL at any bid. Keep the pipeline moving in July — busy weeks are when it stalls and when it's worth most.</li>
+    <li><b>Every saved contact shrinks the toll.</b> A demand caller who saves your number skips Google next time. That's the only long-term price reduction the machine allows.</li>
+  </ol>
+</section>
+
+<footer>MECHANICAL TEMP LLC · LSA CONTROL PANEL v1 · MODEL IS DIRECTIONAL — FEED IT REAL WIN-RATE DATA FROM DSM AND IT GETS SHARP</footer>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>'$'+Math.round(n).toLocaleString();
+let mode='bot';
+
+const demand=$('demand'),bid=$('bid'),wk=$('wk'),cap=$('cap'),gp=$('gp');
+
+$('m-bot').onclick=()=>{mode='bot';paint();};
+$('m-man').onclick=()=>{mode='man';paint();};
+[demand,bid,wk,cap,gp].forEach(el=>el.addEventListener('input',paint));
+
+const presets={
+  now:{d:95,m:'bot',b:60,w:560,c:'0.25',g:350},
+  tq:{d:95,m:'man',b:60,w:300,c:'0.25',g:350},
+  slow:{d:63,m:'man',b:80,w:700,c:'0.40',g:350},
+  winter:{d:8,m:'man',b:70,w:450,c:'0.40',g:425},
+  full:{d:95,m:'man',b:40,w:150,c:'0.10',g:350}
+};
+document.querySelectorAll('.presets button').forEach(b=>b.onclick=()=>{
+  const p=presets[b.dataset.p];
+  demand.value=p.d;mode=p.m;bid.value=p.b;wk.value=p.w;cap.value=p.c;gp.value=p.g;paint();
+});
+
+function paint(){
+  const d=+demand.value, B=+bid.value, W=+wk.value, wr=+cap.value, G=+gp.value||0;
+
+  // market — slider is outdoor temp, demand is distance from mild
+  const oat=Math.round(-10+d*1.1);                       // -10°F .. 100°F
+  const delta=oat-62, div=delta>0?30:55;                 // AC frenzy ramps faster than furnace frenzy
+  const intensity=Math.min(1,Math.pow(Math.abs(delta)/div,1.3));
+  const clearing=40+intensity*55;                        // $40 mild → $95 frenzy
+  const potential=8+intensity*22;                        // leads available/week in area
+  $('deg').textContent=oat+'°';
+  $('deglbl').textContent=
+    oat<15?'Deep freeze · furnace frenzy':
+    oat<45?'Cold snap · steady heating calls':
+    oat<75?'Shoulder season · slow phones, cheap leads':
+    oat<88?'Hot · steady AC calls':
+    'Heat wave · demand frenzy';
+  $('clr').textContent=fmt(clearing);
+  $('pot').textContent='~'+Math.round(potential);
+
+  // mode buttons
+  $('m-bot').className=mode==='bot'?'on bot':'';
+  $('m-man').className=mode==='man'?'on':'';
+  bid.disabled=mode==='bot'; bid.style.opacity=mode==='bot'?0.35:1;
+  $('bidv').textContent=fmt(B); $('wkv').textContent=fmt(W);
+
+  // your side
+  const leadValue=wr*G;
+  $('lval').textContent=fmt(leadValue);
+  $('lval').className='v '+(leadValue>clearing?'good':'bad');
+
+  let cpl,share,flex,spend,leads,raceEl=$('race');
+  if(mode==='bot'){
+    cpl=clearing;
+    flex=1+d/100*1.3;                      // front-loading up to 2.3x in frenzy
+    spend=Math.min(potential*cpl, W*flex);
+    leads=spend/cpl;
+    $('cpln').textContent='Bot pays the market, whatever it is';
+    $('spn').textContent=flex>1.15?'"Average" loophole: bot may front-load to '+fmt(W*flex)+' this week':'Within stated budget';
+    raceEl.className='race bleed';
+    raceEl.textContent='● IN EVERY RACE, AT ANY PRICE — the bot never sits out; it just pays whatever the frenzy asks.';
+  }else{
+    if(B>=clearing){ share=1; cpl=clearing*0.97; }
+    else { share=Math.pow(B/clearing,4); cpl=B; }   // steep dropout below market
+    spend=Math.min(potential*share*cpl, W);
+    leads=cpl>0?spend/cpl:0;
+    $('cpln').textContent=B>=clearing?'You clear the market with room to spare':'Capped at your price';
+    $('spn').textContent='Hard-ish ceiling: manual bid + weekly budget';
+    if(share>=0.95){ raceEl.className='race in'; raceEl.textContent='● IN THE RACE — your cap clears the market. Full visibility at your price.'; }
+    else if(share>0.15){ raceEl.className='race out'; raceEl.textContent='● PARTIAL — sitting out ~'+Math.round((1-share)*100)+'% of auctions where frenzy pricing exceeds your cap. That\'s declining bad bets, not losing.'; }
+    else { raceEl.className='race out'; raceEl.textContent='● PRICED OUT — cap is far below the clearing price; ad is effectively dark. Fine if that\'s the plan (booked solid), a problem if it isn\'t.'; }
+  }
+
+  const jobs=leads*wr;
+  const cbj=wr>0?cpl/wr:0;
+  const net=jobs*G-spend;
+
+  $('cpl').textContent=fmt(cpl);
+  $('cpl').className='v '+(cpl<=leadValue?'good':'bad');
+  $('lw').textContent='~'+leads.toFixed(1);
+  $('lwn').textContent=Math.round(potential)+' available in area';
+  $('sp').textContent=fmt(spend);
+  $('cbj').textContent=fmt(cbj);
+  $('jw').textContent=jobs.toFixed(1);
+  $('net').textContent=(net<0?'−':'')+fmt(Math.abs(net));
+  $('net').className='v '+(net>0?'good':'bad');
+
+  // verdict
+  const v=$('verdict');
+  if(mode==='bot'&&cpl>leadValue){
+    v.className='verdict danger';
+    v.innerHTML='<b>BLEEDING.</b> The bot is paying '+fmt(cpl)+' for leads worth '+fmt(leadValue)+' to you at current capacity. Every lead is a '+fmt(cpl-leadValue)+' donation. Switch to Max per lead ≤ '+fmt(leadValue*0.85)+' or pause.';
+  } else if(cpl>leadValue){
+    v.className='verdict danger';
+    v.innerHTML='<b>CAP TOO HIGH FOR YOUR BOARD.</b> Leads cost '+fmt(cpl)+', worth '+fmt(leadValue)+'. Drop the cap to ≤ '+fmt(leadValue*0.85)+' or free up capacity so the win rate (and lead value) climbs.';
+  } else if(leadValue-cpl>25 && net>0){
+    v.className='verdict';
+    v.innerHTML='<b>PROFITABLE GAP.</b> Paying '+fmt(cpl)+' for '+fmt(leadValue)+' leads — netting ~'+fmt(net)+'/week. If you\'re losing volume, there\'s room to raise the cap toward '+fmt(leadValue*0.85)+' and stay ahead.';
+  } else {
+    v.className='verdict caution';
+    v.innerHTML='<b>THIN.</b> Margin per lead is '+fmt(leadValue-cpl)+'. Works, but one bad week eats it. Raise win rate (faster answer, real arrival windows, rolling-truck texts) — every point of close rate raises what every lead is worth.';
+  }
+
+  // part 1 cards track weekly slider
+  $('c-wk').textContent=fmt(W);
+  $('c-mo').textContent=fmt(W*4.33);
+
+  // part 3 — pricing floor, driven by the same bid + win rate
+  const TR=+$('tr').value, MG=+$('mg').value||0;
+  $('trv').textContent=fmt(TR);
+  const effLead = mode==='man' ? Math.min(B,clearing) : clearing;  // what you actually pay per lead
+  const CAC = wr>0 ? effLead/wr : 0;
+  const floor = CAC+TR+MG;
+  const danger = CAC+TR;
+  const trip = Math.round((TR+55)/10)*10-1;                        // roll + a little, priced to a 9
+  $('cac').textContent=fmt(CAC);
+  $('floor').textContent=fmt(floor);
+  $('floor').className='v '+(floor<=G?'good':'warn');
+  $('l1').textContent=fmt(Math.ceil(floor/10)*10-1);   // book price: floor rounded up, ends in 9
+  $('dz').innerHTML='&lt; '+fmt(danger);
+  $('trip').textContent=fmt(trip);
+
+  const pv=$('pverdict');
+  if(G<danger){
+    pv.className='verdict danger';
+    pv.innerHTML='<b>BOOK IS UNDERWATER.</b> Your average gross per job ('+fmt(G)+') is below CAC + truck roll ('+fmt(danger)+'). At these settings the average demand call loses money before margin. Raise the smallest tiers or raise the win rate.';
+  } else if(G<floor){
+    pv.className='verdict caution';
+    pv.innerHTML='<b>THIN BOOK.</b> Average gross ('+fmt(G)+') clears cost but not your target margin ('+fmt(floor)+' floor). The 20-minute fixes priced by sympathy instead of by the book are where it leaks.';
+  } else {
+    pv.className='verdict';
+    pv.innerHTML='<b>BOOK COVERS THE TOLL.</b> Floor is '+fmt(floor)+' and your average job grosses '+fmt(G)+'. Every completed demand call carries its own acquisition, roll, and margin. Raise the win rate and this floor drops on its own — at 40% wins it falls to '+fmt(effLead/0.40+TR+MG)+'.';
+  }
+}
+$('tr').addEventListener('input',paint);
+$('mg').addEventListener('input',paint);
+paint();
+</script>
+</body>
+</html>
